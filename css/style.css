@@ -1,0 +1,30 @@
+/**
+ * Colors courtesty of Flat UI
+ */
+* {
+  box-sizing: border-box; }
+
+body {
+  font-size: 80%;
+  font-family: "Segoe UI", Serif, Times, serif;
+  color: #34495e; }
+
+.header {
+  font-family: "Segoe UI Light", Serif, Times, serif;
+  font-size: 2em;
+  margin-left: 10px; }
+  .header .light {
+    text-transform: lowercase;
+    font-size: 1em; }
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px; }
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6; }
+
+#GIB {
+  float: left;
+  width: 80%; }

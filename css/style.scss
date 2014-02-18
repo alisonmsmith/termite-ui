@@ -1,0 +1,45 @@
+$body-text: 'Segoe UI', Serif, Times, serif;
+$header-text: 'Segoe UI Light', Serif, Times, serif;
+
+/**
+ * Colors courtesty of Flat UI
+ */
+$emerald: #2ECC71;
+$wetasphalt: #34495E;
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-size: 80%;
+	font-family: $body-text;
+	color: $wetasphalt;
+}
+
+.header {
+	font: {
+		family: $header-text;
+		size: 2em;
+	}
+	margin-left: 10px;
+	.light {
+		text-transform: lowercase;
+		font-size: 1em;
+	}
+}
+
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+#GIB {
+	float: left;
+	width: 80%;
+}
