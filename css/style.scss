@@ -4,6 +4,12 @@ $header-text: 'Segoe UI Light', Serif, Times, serif;
 /**
  * Colors courtesty of Flat UI
  */
+
+$silver: #BDC3C7;
+$clouds: #ECF0F1;
+$concrete: #95A5A6;
+$asbestos: #7F8C8D;
+$turquoise: #1ABC9C;
 $emerald: #2ECC71;
 $wetasphalt: #34495E;
 
@@ -14,7 +20,7 @@ $wetasphalt: #34495E;
 body {
 	font-size: 80%;
 	font-family: $body-text;
-	color: $wetasphalt;
+	color: $turquoise;
 }
 
 .header {
@@ -29,9 +35,20 @@ body {
 	}
 }
 
-.node {
-  stroke: #fff;
+.circle {
+  stroke: #FFFFFF;
+  fill: $silver;
+  opacity: 0.3;
   stroke-width: 1.5px;
+}
+
+.node {
+	cursor: pointer;
+}
+
+.term {
+	fill: $wetasphalt;
+	z-index: 10;
 }
 
 .link {
@@ -41,5 +58,11 @@ body {
 
 #GIB {
 	float: left;
-	width: 80%;
+	width:1250px;
+}
+
+.topic {
+	float:left;
+	border:solid 1px $wetasphalt;
+	margin:5px;
 }

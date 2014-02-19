@@ -7,7 +7,7 @@
 body {
   font-size: 80%;
   font-family: "Segoe UI", Serif, Times, serif;
-  color: #34495e; }
+  color: #1abc9c; }
 
 .header {
   font-family: "Segoe UI Light", Serif, Times, serif;
@@ -17,9 +17,18 @@ body {
     text-transform: lowercase;
     font-size: 1em; }
 
-.node {
-  stroke: #fff;
+.circle {
+  stroke: #FFFFFF;
+  fill: #bdc3c7;
+  opacity: 0.3;
   stroke-width: 1.5px; }
+
+.node {
+  cursor: pointer; }
+
+.term {
+  fill: #34495e;
+  z-index: 10; }
 
 .link {
   stroke: #999;
@@ -27,4 +36,9 @@ body {
 
 #GIB {
   float: left;
-  width: 80%; }
+  width: 1250px; }
+
+.topic {
+  float: left;
+  border: solid 1px #34495e;
+  margin: 5px; }

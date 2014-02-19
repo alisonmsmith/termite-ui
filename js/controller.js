@@ -1,18 +1,36 @@
 $(document).ready(function () {
 	// load the data
-	//d3.json("data/10topics-10words.json", function(error, topicmodel) {
-		//for (var topic in data.topics) {}
-
-		var topic = [];
-		var nodes = [];
-		var edges = [];
-
-			for (var term in topicmodeldata.TermCoFreqs) {
-				topic.push(term);
-				nodes.push({"name":term});
+	var topics = [];
+	//$.ajax({
+	//	url: "http://treetm.jcchuang.org/nsf1k_mallet/vis/GroupInABox?format=json&termLimit=5",
+	//	success: function (data) {
+			var counter = 0;
+			for (var topic in data.TopTermsPerTopic) {
+				var nodes = [];
+				var edges = [];
+				$.each(data.TopTermsPerTopic[topic], function (index, term) {
+					// TODO: I really don't like how this is being stored in the JSON... 
+					for (var k in term) {
+						nodes.push({"name":k, "value":term[k]});
+					}
+				});
+			//	edges.push({"sourece":2, "target":3, "weight":1});
+				topics.push({"nodes":nodes, "edges":edges, "id":"topic" + counter});
+				counter += 1;
 			}
+			$.each(topics, function (index, topic) {
+				// Add a div to the html
+				$("#topics").append("<span class='topic' id='" + topic.id + "'></span>");
+				// Render the topic
+				renderTopic(topic);
+			});
+		//},
+		//failure: function (msg) {
+		//	console.log("failure: " + msg);
+		//}
+	//});
 
-		for (var term in topicmodeldata.TermCoFreqs) {
+		/*for (var term in topicmodeldata.TermCoFreqs) {
 			if (topic.indexOf(term) !== -1) {
 				for (var term2 in topicmodeldata.TermCoFreqs[term]) {
 					if (term !== term2) {
@@ -28,45 +46,57 @@ $(document).ready(function () {
 
 				}
 			}
-		}
+		}*/
 
-		renderTopic({"nodes":nodes, "edges":edges}, "topic1");
+		
 	//});
 });
 
-function renderTopic(data, id) {
+function renderTopic(topic) {
 	var width = 200,
     height = 200;
 
 	var color = d3.scale.category20();
 
+	var k = Math.sqrt(topic.nodes.length / (width * height));
+
+
 	var force = d3.layout.force()
-	    .charge(-120)
+	        .charge(-10 / k)
+    .gravity(100 * k)
 	    .linkDistance(50)
 	    .size([width, height]);
 
-	var svg = d3.select("#" + id).append("svg")
+	var svg = d3.select("#" + topic.id).append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
 
 	
 	  force
-	      .nodes(data.nodes)
-	      .links(data.edges)
+	      .nodes(topic.nodes)
+	      .links(topic.edges)
 	      .start();
 
 	  var link = svg.selectAll(".link")
-	      .data(data.edges)
-	    .enter().append("line")
-	      .attr("class", "link");
-	      //.style("stroke-width", function(d) { return (d.value/1000); });
+	       .data(topic.edges)
+	       .enter().append("line")
+	       .attr("class", "link");
+	       //.style("stroke-width", function(d) { return (d.value/1000); });
 
-	  var node = svg.selectAll(".node")
-	      .data(data.nodes)
-	    .enter().append("circle")
-	      .attr("class", "node")
-	      .attr("r", 5)
-	      .call(force.drag);
+	  	var node = svg.selectAll("g.node")
+	      	.data(topic.nodes)
+	        .enter().append("g")
+	      	.attr("class", "node");
+
+	    var circle = node.append("circle")
+	    	.attr("class", "circle")
+	    	.attr("r", function (d) { return Math.min(d.value/10, 40) + "px"; })
+	    	.call(force.drag);
+
+	    var label = node.append("text")
+	    	.attr("class", "term")
+	    	.text(function(d) { return d.name})
+	    	.attr("text-anchor", "middle");
 
 	  node.append("title")
 	      .text(function(d) { return d.name; });
@@ -77,7 +107,9 @@ function renderTopic(data, id) {
 	        .attr("x2", function(d) { return d.target.x; })
 	        .attr("y2", function(d) { return d.target.y; });
 
-	    node.attr("cx", function(d) { return d.x; })
-	        .attr("cy", function(d) { return d.y; });
+	    node.attr("transform", function(d) { 
+    		return 'translate(' + [d.x, d.y] + ')'; 
+  		}); 
+
 	  });
 }
