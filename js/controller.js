@@ -86,7 +86,9 @@ function renderTopic(topic) {
 	  	var node = svg.selectAll("g.node")
 	      	.data(topic.nodes)
 	        .enter().append("g")
-	      	.attr("class", "node");
+			.attr("class", function(d) { return "node node__"+d.name })
+			.on( "mouseover", function(d) { d3.selectAll("g.node__"+d.name).selectAll("circle").style("fill", "#933").style("stroke", "#933") })
+			.on( "mouseout", function(d) { d3.selectAll("g.node__"+d.name).selectAll("circle").style("fill", null).style("stroke", null) });
 
 	    var circle = node.append("circle")
 	    	.attr("class", "circle")
