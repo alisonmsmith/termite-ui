@@ -87,7 +87,8 @@ function renderTopic(topic) {
 	      	.data(topic.nodes)
 	        .enter().append("g")
 			.attr("class", function(d) { return "node node__"+d.name })
-			.on( "mouseover", function(d) { d3.selectAll("g.node__"+d.name).selectAll("circle").style("fill", "#933").style("stroke", "#933") })
+			// Highlight all matching term nodes
+			.on( "mouseover", function(d) { d3.selectAll("g.node__"+d.name).selectAll("circle").style("fill", "#2ECC71").style("stroke", "#2ECC71") })
 			.on( "mouseout", function(d) { d3.selectAll("g.node__"+d.name).selectAll("circle").style("fill", null).style("stroke", null) });
 
 	    var circle = node.append("circle")

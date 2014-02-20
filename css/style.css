@@ -1,16 +1,13 @@
-/**
- * Colors courtesty of Flat UI
- */
 * {
   box-sizing: border-box; }
 
 body {
   font-size: 80%;
-  font-family: "Segoe UI", Serif, Times, serif;
+  font-family: "Lato", Helvetica, Arial, sans-serif;
   color: #1abc9c; }
 
 .header {
-  font-family: "Segoe UI Light", Serif, Times, serif;
+  font-weight: 300;
   font-size: 2em;
   margin-left: 10px; }
   .header .light {

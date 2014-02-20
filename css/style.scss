@@ -1,17 +1,18 @@
-$body-text: 'Segoe UI', Serif, Times, serif;
-$header-text: 'Segoe UI Light', Serif, Times, serif;
+//$body-text: 'Segoe UI', Serif, Times, serif;
+//$header-text: 'Segoe UI Light', Serif, Times, serif;
+$body-text: 'Lato', Helvetica, Arial, sans-serif;
 
-/**
- * Colors courtesty of Flat UI
- */
 
+// Colors courtesty of Flat UI
 $silver: #BDC3C7;
 $clouds: #ECF0F1;
 $concrete: #95A5A6;
 $asbestos: #7F8C8D;
 $turquoise: #1ABC9C;
+$greensea: #16A085;
 $emerald: #2ECC71;
 $wetasphalt: #34495E;
+$belizehold: #2980B9;
 
 * {
 	box-sizing: border-box;
@@ -25,7 +26,8 @@ body {
 
 .header {
 	font: {
-		family: $header-text;
+	//	family: $header-text;
+		weight: 300;
 		size: 2em;
 	}
 	margin-left: 10px;
