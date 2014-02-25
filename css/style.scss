@@ -46,6 +46,7 @@ body {
 
 .node {
 	cursor: pointer;
+	z-index:9;
 }
 
 .term {
@@ -54,8 +55,9 @@ body {
 }
 
 .link {
-  stroke: #999;
-  stroke-opacity: .6;
+  stroke: $asbestos;
+  z-index:0;
+  stroke-opacity: .8;
 }
 
 #GIB {

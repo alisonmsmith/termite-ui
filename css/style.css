@@ -21,15 +21,17 @@ body {
   stroke-width: 1.5px; }
 
 .node {
-  cursor: pointer; }
+  cursor: pointer;
+  z-index: 9; }
 
 .term {
   fill: #34495e;
   z-index: 10; }
 
 .link {
-  stroke: #999;
-  stroke-opacity: .6; }
+  stroke: #7f8c8d;
+  z-index: 0;
+  stroke-opacity: .8; }
 
 #GIB {
   float: left;

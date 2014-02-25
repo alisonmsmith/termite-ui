@@ -14,7 +14,19 @@ $(document).ready(function () {
 						nodes.push({"name":k, "value":term[k]});
 					}
 				});
-			//	edges.push({"sourece":2, "target":3, "weight":1});
+				// Determine the edges for each node
+				// TODO: a better data structure may make this more efficient
+				$.each(nodes, function (source, node) {
+					$.each(data.TermCoFreqs[node.name], function (term, value) {
+						if (value > 500 && term !== node.name) {
+							$.each(nodes, function (target, node2) {
+								if (term === node2.name) {
+									edges.push({"source":source, "target":target, "value":value});
+								}
+							});
+						}
+					});
+				})
 				topics.push({"nodes":nodes, "edges":edges, "id":"topic" + counter});
 				counter += 1;
 			}
@@ -24,6 +36,11 @@ $(document).ready(function () {
 				// Render the topic
 				renderTopic(topic);
 			});
+
+			for (var term in data.TermCoFreqs) {
+
+			}
+
 		//},
 		//failure: function (msg) {
 		//	console.log("failure: " + msg);
@@ -59,12 +76,16 @@ function renderTopic(topic) {
 	var color = d3.scale.category20();
 
 	var k = Math.sqrt(topic.nodes.length / (width * height));
+	var d = 2*topic.edges.length/(topic.nodes.length*(topic.nodes.length-1));
 
 
+	//TODO: should the force directed layout take edge weight into account? 
 	var force = d3.layout.force()
-	        .charge(-10 / k)
-    .gravity(100 * k)
-	    .linkDistance(50)
+	    .charge(-10 / k)
+    	.gravity(80 * k)
+    	// a denser graph needs the nodes to be pushed further away
+	    .linkDistance(Math.min(Math.max(30, 200*d), 200))
+	    //.linkStrength(function (d) { return Math.min(d.value/1000, 1); })
 	    .size([width, height]);
 
 	var svg = d3.select("#" + topic.id).append("svg")
@@ -81,7 +102,7 @@ function renderTopic(topic) {
 	       .data(topic.edges)
 	       .enter().append("line")
 	       .attr("class", "link");
-	       //.style("stroke-width", function(d) { return (d.value/1000); });
+	      // .style("stroke-width", function(d) { return Math.sqrt(d.value/100); });
 
 	  	var node = svg.selectAll("g.node")
 	      	.data(topic.nodes)
