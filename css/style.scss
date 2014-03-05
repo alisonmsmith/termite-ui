@@ -1,6 +1,4 @@
-//$body-text: 'Segoe UI', Serif, Times, serif;
-//$header-text: 'Segoe UI Light', Serif, Times, serif;
-$body-text: 'Lato', Helvetica, Arial, sans-serif;
+$body-text: 'CakeLato', Helvetica, Arial, sans-serif;
 
 
 // Colors courtesty of Flat UI
@@ -12,7 +10,43 @@ $turquoise: #1ABC9C;
 $greensea: #16A085;
 $emerald: #2ECC71;
 $wetasphalt: #34495E;
-$belizehold: #2980B9;
+$belizehole: #2980B9;
+$peterriver: #3498DB;
+$amethyst: #9B59B6;
+$wisteria: #8E44AD;
+$carrot: #E67E22;
+$pumpkin: #D35400;
+$alizarin: #E74C3C;
+
+// Transition property compatible in all
+// supporting browsers. 
+@mixin universal-transition($time, $type: all) {
+	-webkit-transition: $type $time;
+	-moz-transition: $type $time;
+	-o-transition: $type $time;
+	transition: $type $time;
+}
+
+@mixin universal-placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+    	color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    	color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+    	color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+    	color: $color;
+	}
+}
+
+@mixin universal-not-select() {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
 
 * {
 	box-sizing: border-box;
@@ -26,7 +60,6 @@ body {
 
 .header {
 	font: {
-	//	family: $header-text;
 		weight: 300;
 		size: 2em;
 	}
@@ -38,20 +71,34 @@ body {
 }
 
 .circle {
-  stroke: #FFFFFF;
   fill: $silver;
   opacity: 0.3;
-  stroke-width: 1.5px;
+  stroke-width: 4px;
 }
 
 .node {
 	cursor: pointer;
-	z-index:9;
+	&.new {
+		.circle {
+			fill: $wisteria;
+		}
+	}
+	&.selected {
+		.circle {
+			stroke: $belizehole;
+			stroke-width: 4px;
+		}
+	}
+	&.hovered {
+		.circle {
+			fill: $belizehole;
+		}
+	}
 }
 
 .term {
+	@include universal-not-select();
 	fill: $wetasphalt;
-	z-index: 10;
 }
 
 .link {
@@ -65,8 +112,167 @@ body {
 	width:1250px;
 }
 
+$topicwidth: 225px;
+$topicnamewidth: 100px;
+$topicheight: 225px;
 .topic {
-	float:left;
-	border:solid 1px $wetasphalt;
-	margin:5px;
+	width: $topicwidth;
+	height: $topicheight;
+	float: left;
+	border: solid 1px $wetasphalt;
+	margin: 5px;
 }
+
+.topic-header {
+	@include universal-transition(.25s, width);
+	position: absolute;
+	width: $topicnamewidth;
+	padding: 2px;
+	padding-left: 15px;
+	text-align: left;
+	background-color: $turquoise;
+	color: $clouds;
+	opacity: 0.7;
+	.icon {
+		&.active {
+			&:hover {
+				background-color: $greensea;
+			}
+			&.selected {
+				background-color: $greensea;
+			}
+		}
+	}
+	&:hover {
+		width: $topicwidth - 2;
+		.topic-edit {
+			display: inline;
+		}
+	}
+
+	// EDIT MODE
+	&.edit {
+		padding: 2px;
+		border: solid 2px $belizehole;
+		background-color: $peterriver;
+		width: $topicwidth - 2;
+		.icon {
+			&.active {
+				&:hover {
+					background-color: $belizehole;
+				}
+				&.selected {
+					background-color: $belizehole;
+				}
+			}
+		}
+		.topic-toolbox, .topic-edit {
+			display: inline;
+		}
+		.topic-name-input {			
+			width: 100px;
+		}
+		.topic-name {
+			display: none;
+		}
+	}
+}
+
+	.icon {
+		padding: 5px;
+		
+		&.active {
+			cursor: pointer;
+			color: $clouds;
+			&:hover {
+				background-color: $silver;
+			}
+			&.selected {
+				background-color: $silver;
+			}
+		}
+		&.inactive {
+			color: $silver;
+		}
+
+	}
+
+.topic-edit, .topic-toolbox {
+	float: right;
+	display: none;
+}
+
+.topic-toolbox {
+	padding-top: 5px;
+}
+
+.topic-footer {
+	position: absolute; 
+	top: 235px;
+	background-color: $asbestos;
+	opacity: 0.7;
+	width: $topicwidth - 2;
+	&.add {
+		padding: 4px;
+		.topic-word-input {
+			display: inline;
+		}
+		.topic-edit-complete{
+			display: inline;
+		}
+	}
+	&.edit {
+		padding: 4px;
+		.topic-edit-instructions {
+			display: inline;
+		}
+		.topic-edit-complete {
+			display: inline;
+		}
+	}
+}
+
+.topic-edit-complete {
+	float: right;
+	display: none;
+}
+
+input {
+	outline: 0;
+	border: none;
+}
+
+.topic-edit-instructions {
+	display: none;
+	background-color: $asbestos;
+	color: $clouds;
+}
+
+.topic-word-input {
+	@include universal-placeholder-color($silver);
+	background-color: $asbestos;
+	color: $clouds;
+	display: none;
+//	position: relative;
+}
+
+/*.topic-cue {
+	position:absolute;
+	padding:5px;
+	width:10px;
+	color: $wetasphalt;
+	background-color:$wetasphalt;
+	opacity: 1.0;
+}*/
+
+.topic-name-input {
+	overflow:none;
+	width:0;
+	@include universal-placeholder-color($silver);
+//	position: relative;
+  	//padding: 4px 6px;
+  	color: $clouds;
+  	background-color: $peterriver;
+}
+
+
