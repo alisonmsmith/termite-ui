@@ -225,6 +225,7 @@ function renderTopic(topic) {
 	var svg = d3.select("#" + topic.id).append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
+	console.log("height", height)
 
 	
 	  force

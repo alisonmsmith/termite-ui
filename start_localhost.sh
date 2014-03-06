@@ -19,10 +19,7 @@ launch_localhost() {
 	echo "Starting a python SimpleHTTPServer at port 8000..."
 	echo "Press Ctrl+C to close this python web server."
 	echo
-	python -m SimpleHTTPServer 8000
-	
-	# Uncomment the following line once all files are moved into folder 'public_html'
-	# cd public_html && python -m SimpleHTTPServer 8000
+	cd public_html && python -m SimpleHTTPServer 8000
 }
 
 launch_browser &
