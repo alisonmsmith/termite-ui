@@ -24,10 +24,10 @@ body {
   .node.new .circle {
     fill: #8e44ad; }
   .node.selected .circle {
-    stroke: #2980b9;
+    stroke: #1abc9c;
     stroke-width: 4px; }
   .node.hovered .circle {
-    fill: #2980b9; }
+    fill: #1abc9c; }
 
 .term {
   user-select: none;
@@ -47,9 +47,12 @@ body {
 .topic {
   width: 225px;
   height: 225px;
-  float: left;
+  position: absolute;
   border: solid 1px #34495e;
   margin: 5px; }
+
+.topic-hovered .topic-header {
+  background-color: #1abc9c; }
 
 .topic-header {
   -webkit-transition: width 0.25s;
@@ -61,7 +64,7 @@ body {
   padding: 2px;
   padding-left: 15px;
   text-align: left;
-  background-color: #1abc9c;
+  background-color: #95a5a6;
   color: #ecf0f1;
   opacity: 0.7; }
   .topic-header .icon.active:hover {
@@ -108,8 +111,9 @@ body {
   padding-top: 5px; }
 
 .topic-footer {
-  position: absolute;
-  top: 235px;
+  display: inline-block;
+  position: relative;
+  top: -33px;
   background-color: #7f8c8d;
   opacity: 0.7;
   width: 223px; }

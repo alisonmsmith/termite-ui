@@ -4,6 +4,7 @@
 $(document).ready(function () {
 	// load the data
 	var topics = [];
+	var layout = twentytopiclayout;
 
 
 
@@ -14,6 +15,20 @@ $(document).ready(function () {
 			for (var topic in data.TopTermsPerTopic) {
 				var nodes = [];
 				var edges = [];
+				var connections = [];
+
+				// Determine the graph connections (topic co-occurrence)
+				$.each(data.TopicCooccurrence[topic], function (id, value) {
+					if (value >= 2.0) {
+						// add as a connection
+						if (topic !== id) {
+							connections.push({"id": getTopicId(id), "value": value});
+						}
+						
+					}
+				});
+
+				// Determine the nodes (words of the topic)
 				$.each(data.TopTermsPerTopic[topic], function (index, term) {
 					// TODO: I really don't like how this is being stored in the JSON... 
 					for (var k in term) {
@@ -33,8 +48,7 @@ $(document).ready(function () {
 						}
 					});
 				})
-				topics.push({"nodes":nodes, "edges":edges, "id":"topic" + counter, "name":"TOPIC " + counter});
-				counter += 1;
+				topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "name":"TOPIC " + topic, "connections":connections});
 			}
 			$.each(topics, function (index, topic) {
 				// Add a div to the html
@@ -62,7 +76,7 @@ $(document).ready(function () {
 									if (val === "") {
 										val = $(this).attr("placeholder");
 									}
-									$(this).parents(".topic-header").removeClass("selected").find(".topic-name").html(val);
+									$(this).parents(".topic-header").removeClass("selected").removeClass("edit").find(".topic-name").html(val);
 								}
 							}) // keypress
 						 )
@@ -70,11 +84,22 @@ $(document).ready(function () {
 							.attr("class", "icon topic-edit icon-wrench active")
 							.attr("title", "edit topic")
 							.on("click", function () {
-								// If the wrench is clicked, allow user to input a new name
-								$(this).addClass("selected");
+								// If the wrench is clicked, enter or exit edit mode 
+								
 								var $header =  $(this).parents(".topic-header");
-								var name = $header.addClass("edit").find(".topic-name").text();
-								$header.find(".topic-name-input").attr("placeholder", name).focus();
+								if ($header.hasClass("edit")) {
+									$(this).removeClass("selected");
+									var val = $header.find(".topic-name-input").val();
+									if (val === "") {
+										val = $header.find(".topic-name-input").attr("placeholder");
+									}
+									$header.removeClass("edit").find(".topic-name").html(val);
+								} else {
+									$(this).addClass("selected");
+									var name = $header.addClass("edit").find(".topic-name").text();
+									$header.find(".topic-name-input").attr("placeholder", name).focus();
+								}
+
 							})
 						)
 						.append($("<span></span>")
@@ -110,6 +135,7 @@ $(document).ready(function () {
 							)
 						) // topic toolbox
 					) // topic header
+					.append("<span class='topic-svg'></span>")
 					.append($("<span></span>")
 						.attr("class", "topic-footer")
 						.append($("<input>")
@@ -141,9 +167,60 @@ $(document).ready(function () {
 					) // topic footer
 				);
 				// Render the topic
-				topicGraphs[topic.id] = new graph(topic);
+				var g = new graph(topic);
+				topicGraphs[topic.id] = {"graph": g,
+										 "connections": topic.connections,
+										 "placed":false};
 				//renderTopic(topic);
 			});
+
+	// LAYOUT THE TOPICS
+	/*var numCols = 5,
+		numRows = data.TopTermsPerTopic.length/numCols,
+		layout = [[]];
+
+	for (var j=0; j<numRows; j++) {
+		for (var k=0; k<numCols; k++) {
+			layout[j][k] = undefined;
+		}
+	} */
+
+	topics.sort(function (a, b) {
+		if (a.connections.length > b.connections.length) {
+			return -1;
+		} 
+		if (a.connections.length < b.connections.length) {
+			return 1;
+		}
+		return 0;
+	});
+
+	for (var i=0; i<topics.length; i++) {
+		topicGraphs[topics[i].id].graph.layout(layout[i]);
+	}
+
+	/*var count = 0;
+	while (count < data.TopTermsPerTopic.length) {
+		// find the most connected remaining topic
+		var max = 0;
+		var connectedTopic = null;
+		for (var topic in topicGraphs) {
+			if (!topic.placed) {
+				if (topic.connections.length > max) {
+					connectedTopic = topic;
+				}
+			}
+		}
+
+		//place the connected topic in the center
+		//placeAt(numRows/2, numCols/2, connectedTopic);
+		//topicGraphs[connectedTopic.id].placed = true;
+		//count ++;
+
+		// place the connections around the center
+		
+		
+	} */
 
 		//},
 		//failure: function (msg) {
@@ -175,6 +252,10 @@ $(document).ready(function () {
 
 function addWord(word, topic) {
 	topicGraphs[topic].addNode({"name":word, "value":100, "class":"new"}); 
+}
+
+function getTopicId(id) {
+	return "topic" + id;
 }
 
 
@@ -225,7 +306,6 @@ function renderTopic(topic) {
 	var svg = d3.select("#" + topic.id).append("svg")
 	    .attr("width", width)
 	    .attr("height", height);
-	console.log("height", height)
 
 	
 	  force

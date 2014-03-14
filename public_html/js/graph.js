@@ -23,6 +23,10 @@ function graph (topic) {
         update();
     }
 
+    this.layout = function (layout) {
+        $el.css(layout);
+    }
+
     var findNode = function(name) {
         for (var i in nodes) {if (nodes[i]["name"] === name) return nodes[i]};
     }
@@ -38,7 +42,20 @@ function graph (topic) {
     var k = Math.sqrt(topic.nodes.length / (w * h)),
         d = 2*topic.edges.length/(topic.nodes.length*(topic.nodes.length-1));
 
-    var vis = this.vis = d3.select("#" + topic.id).append("svg")
+        d3.select("#" + topic.id).on("mouseover", function () {
+        // highlight self and all connected topics
+        $(this).addClass("topic-hovered");
+        $.each(topic.connections, function (index, t) {
+            $("#"+t.id).addClass("topic-hovered");
+        });
+    }).on("mouseout", function () {
+        $(this).removeClass("topic-hovered");
+        $.each(topic.connections, function (index, t) {
+            $("#"+t.id).removeClass("topic-hovered");
+        });
+    })
+
+    var vis = this.vis = d3.select("#" + topic.id + "> .topic-svg").append("svg")
         .attr("width", w)
         .attr("height", h);
 
