@@ -4,7 +4,7 @@ var topicGraphs = {};
 $(document).ready( function() {
 	var dataManager = new DataManager();
 	dataManager.on("update", loadData);
-	loadData();
+	dataManager.update();
 } );
 
 function loadData(modelID, termLimit) {
@@ -19,11 +19,11 @@ function loadData(modelID, termLimit) {
 		url: url,
 		success: function (data, msg) {
 			data = JSON.parse(data);
-			console.log("[LOAD]", "Results:", msg, "Data:", data);
+			console.log("[LOAD]", "URL", url, "Results:", msg, "Data:", data);
 			initGroupInABox(data);
 		},
 		error: function (data, msg) {
-			console.log("[LOAD]", "Results:", msg, "Data:", data);
+			console.log("[LOAD]", "URL", url, "Results:", msg, "Data:", data);
 		}
 	});
 }
