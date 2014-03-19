@@ -10,9 +10,13 @@ body {
   font-weight: 300;
   font-size: 2em;
   margin-left: 10px; }
-  .header .light {
+.header .light {
     text-transform: lowercase;
     font-size: 1em; }
+
+.DataManager {
+  font-size: 1em;
+  margin-left: 10px; }
 
 .circle {
   fill: #bdc3c7;

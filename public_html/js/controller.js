@@ -1,178 +1,204 @@
-	// global topic graph map
-	var topicGraphs = {};
+// global topic graph map
+var topicGraphs = {};
 
-$(document).ready(function () {
-	// load the data
+$(document).ready( function() {
+	var dataManager = new DataManager();
+	dataManager.on("update", loadData);
+	loadData();
+} );
+
+function loadData(modelID, termLimit) {
+	if (!modelID) {
+		modelID = "nsf1k_mallet";
+	}
+	if (!termLimit) {
+		termLimit = 10;
+	}
+	var url = "http://treetm.jcchuang.org/" + modelID + "/vis/GroupInABox?format=json&termLimit=" + termLimit;
+	$.ajax({
+		url: url,
+		success: function (data, msg) {
+			data = JSON.parse(data);
+			console.log("[LOAD]", "Results:", msg, "Data:", data);
+			initGroupInABox(data);
+		},
+		error: function (data, msg) {
+			console.log("[LOAD]", "Results:", msg, "Data:", data);
+		}
+	});
+}
+
+function initGroupInABox(data) {
 	var topics = [];
 	var layout = twentytopiclayout;
 
+	var counter = 0;
+	for (var topic in data.TopTermsPerTopic) {
+		var nodes = [];
+		var edges = [];
+		var connections = [];
 
+		// Determine the graph connections (topic co-occurrence)
+		$.each(data.TopicCooccurrence[topic], function (id, value) {
+			if (value >= 2.0) {
+				// add as a connection
+				if (topic !== id) {
+					connections.push({"id": getTopicId(id), "value": value});
+				}
+				
+			}
+		});
 
-	//$.ajax({
-	//	url: "http://treetm.jcchuang.org/nsf1k_mallet/vis/GroupInABox?format=json&termLimit=5",
-	//	success: function (data) {
-			var counter = 0;
-			for (var topic in data.TopTermsPerTopic) {
-				var nodes = [];
-				var edges = [];
-				var connections = [];
-
-				// Determine the graph connections (topic co-occurrence)
-				$.each(data.TopicCooccurrence[topic], function (id, value) {
-					if (value >= 2.0) {
-						// add as a connection
-						if (topic !== id) {
-							connections.push({"id": getTopicId(id), "value": value});
-						}
-						
-					}
-				});
-
-				// Determine the nodes (words of the topic)
-				$.each(data.TopTermsPerTopic[topic], function (index, term) {
-					// TODO: I really don't like how this is being stored in the JSON... 
-					for (var k in term) {
-						nodes.push({"name":k, "value":term[k], "class":"existing"});
-					}
-				});
-				// Determine the edges for each node
-				// TODO: a better data structure may make this more efficient
-				$.each(nodes, function (source, node) {
-					$.each(data.TermCoFreqs[node.name], function (term, value) {
-						if (value > 500 && term !== node.name) {
-							$.each(nodes, function (target, node2) {
-								if (term === node2.name) {
-									edges.push({"source":source, "target":target, "value":value});
-								}
-							});
+		// Determine the nodes (words of the topic)
+		$.each(data.TopTermsPerTopic[topic], function (index, term) {
+			// TODO: I really don't like how this is being stored in the JSON... 
+			for (var k in term) {
+				nodes.push({"name":k, "value":term[k], "class":"existing"});
+			}
+		});
+		// Determine the edges for each node
+		// TODO: a better data structure may make this more efficient
+		$.each(nodes, function (source, node) {
+			$.each(data.TermCoFreqs[node.name], function (term, value) {
+				if (value > 500 && term !== node.name) {
+					$.each(nodes, function (target, node2) {
+						if (term === node2.name) {
+							edges.push({"source":source, "target":target, "value":value});
 						}
 					});
-				})
-				topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "name":"TOPIC " + topic, "connections":connections});
-			}
-			$.each(topics, function (index, topic) {
-				// Add a div to the html
-				$("#topics").append($("<span></span>")
-					.attr("class", "topic")
-					.attr("id", topic.id)
-					//.append("<span class='topic-cue'></span>")
-					.append($("<span></span>")
-						.attr("class", "topic-header")
-						.append($("<span></span>")
-							.html(topic.name)
-							.attr("class", "topic-name")
-						)
-						.append($("<input>")
-							.attr("type", "text")
-							.attr("class", "topic-name-input")
-							//.attr("placeholder", function () { return $(this).parent().find(".topic-name").text(); })
-							.on("click", function () {
-								return false;
-							}) // click
-							.keypress(function (event) {
-								if (event.which === 13) {
-									// If the user enters a new name, swap it for the topic name
-									var val = $(this).val();
-									if (val === "") {
-										val = $(this).attr("placeholder");
-									}
-									$(this).parents(".topic-header").removeClass("selected").removeClass("edit").find(".topic-name").html(val);
-								}
-							}) // keypress
-						 )
-						.append($("<span></span>")
-							.attr("class", "icon topic-edit icon-wrench active")
-							.attr("title", "edit topic")
-							.on("click", function () {
-								// If the wrench is clicked, enter or exit edit mode 
-								
-								var $header =  $(this).parents(".topic-header");
-								if ($header.hasClass("edit")) {
-									$(this).removeClass("selected");
-									var val = $header.find(".topic-name-input").val();
-									if (val === "") {
-										val = $header.find(".topic-name-input").attr("placeholder");
-									}
-									$header.removeClass("edit").find(".topic-name").html(val);
-								} else {
-									$(this).addClass("selected");
-									var name = $header.addClass("edit").find(".topic-name").text();
-									$header.find(".topic-name-input").attr("placeholder", name).focus();
-								}
-
-							})
-						)
-						.append($("<span></span>")
-							.attr("class", "topic-toolbox")
-							// ADD WORD TO TOPIC
-							.append($("<span></span>")
-								.attr("class", "icon add-word icon-plus active")
-								.attr("title", "add words to the topic")
-								.on("click", function () {
-									$(this).addClass("selected");
-									$(this).parents(".topic").find(".topic-footer").addClass("add").find(".topic-word-input").focus();
-								})
-							)
-							// REMOVE WORD FROM TOPIC
-							.append($("<span></span>")
-								.attr("class", "icon remove-word icon-scissors inactive")
-								.attr("title", "remove word from topic")
-
-							)
-							// SPLIT TOPIC
-							.append($("<span></span>")
-								.attr("class", "icon topic-split icon-fork active")
-								.attr("title", "split topic")
-								.on("click", function () {
-									$(this).addClass("selected");
-									$(this).parents(".topic").find(".topic-footer").addClass("edit").find(".topic-edit-instructions").html("select the terms for the new topic").show();
-								})
-							)
-							// LOCK TOPIC
-							.append($("<span></span>")
-								.attr("class", "icon topic-lock icon-unlocked active")
-								.attr("title", "lock topic")
-							)
-						) // topic toolbox
-					) // topic header
-					.append("<span class='topic-svg'></span>")
-					.append($("<span></span>")
-						.attr("class", "topic-footer")
-						.append($("<input>")
-							.attr("type", "text")
-							.attr("class", "topic-word-input")
-							.keypress(function (event) {
-								if (event.which === 13) {
-									// If the user enters a word, add it to the topic
-									var word = $(this).val(),
-									topic = $(this).parents(".topic").attr("id");
-									addWord(word, topic);
-									$(this).val("");
-								}
-							}) // keypress
-						)						
-						.append($("<span></span>")
-							.attr("class","icon topic-edit-complete icon-checkmark active")
-							.attr("title", "done")
-							.on("click", function () {
-								$(this).parents(".topic-footer").removeClass("edit").removeClass("add");
-								var $header = $(this).parents(".topic").find(".topic-header");
-								$header.find(".topic-split").removeClass("selected");
-								$header.find(".add-word").removeClass("selected");
-							}) // click
-						)
-						.append($("<span></span>")
-							.attr("class", "topic-edit-instructions")
-						)
-					) // topic footer
-				);
-				// Render the topic
-				var g = new graph(topic);
-				topicGraphs[topic.id] = {"graph": g,
-										 "connections": topic.connections,
-										 "placed":false};
-				//renderTopic(topic);
+				}
 			});
+		})
+		topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "name":"TOPIC " + topic, "connections":connections});
+	}
+	
+	// Clear all existing DIVs
+	$("span.topic").remove();
+	
+	// Add new DIVs
+	$.each(topics, function (index, topic) {
+		// Add a div to the html
+		$("#topics").append($("<span></span>")
+			.attr("class", "topic")
+			.attr("id", topic.id)
+			//.append("<span class='topic-cue'></span>")
+			.append($("<span></span>")
+				.attr("class", "topic-header")
+				.append($("<span></span>")
+					.html(topic.name)
+					.attr("class", "topic-name")
+				)
+				.append($("<input>")
+					.attr("type", "text")
+					.attr("class", "topic-name-input")
+					//.attr("placeholder", function () { return $(this).parent().find(".topic-name").text(); })
+					.on("click", function () {
+						return false;
+					}) // click
+					.keypress(function (event) {
+						if (event.which === 13) {
+							// If the user enters a new name, swap it for the topic name
+							var val = $(this).val();
+							if (val === "") {
+								val = $(this).attr("placeholder");
+							}
+							$(this).parents(".topic-header").removeClass("selected").removeClass("edit").find(".topic-name").html(val);
+						}
+					}) // keypress
+				 )
+				.append($("<span></span>")
+					.attr("class", "icon topic-edit icon-wrench active")
+					.attr("title", "edit topic")
+					.on("click", function () {
+						// If the wrench is clicked, enter or exit edit mode 
+						
+						var $header =  $(this).parents(".topic-header");
+						if ($header.hasClass("edit")) {
+							$(this).removeClass("selected");
+							var val = $header.find(".topic-name-input").val();
+							if (val === "") {
+								val = $header.find(".topic-name-input").attr("placeholder");
+							}
+							$header.removeClass("edit").find(".topic-name").html(val);
+						} else {
+							$(this).addClass("selected");
+							var name = $header.addClass("edit").find(".topic-name").text();
+							$header.find(".topic-name-input").attr("placeholder", name).focus();
+						}
+
+					})
+				)
+				.append($("<span></span>")
+					.attr("class", "topic-toolbox")
+					// ADD WORD TO TOPIC
+					.append($("<span></span>")
+						.attr("class", "icon add-word icon-plus active")
+						.attr("title", "add words to the topic")
+						.on("click", function () {
+							$(this).addClass("selected");
+							$(this).parents(".topic").find(".topic-footer").addClass("add").find(".topic-word-input").focus();
+						})
+					)
+					// REMOVE WORD FROM TOPIC
+					.append($("<span></span>")
+						.attr("class", "icon remove-word icon-scissors inactive")
+						.attr("title", "remove word from topic")
+
+					)
+					// SPLIT TOPIC
+					.append($("<span></span>")
+						.attr("class", "icon topic-split icon-fork active")
+						.attr("title", "split topic")
+						.on("click", function () {
+							$(this).addClass("selected");
+							$(this).parents(".topic").find(".topic-footer").addClass("edit").find(".topic-edit-instructions").html("select the terms for the new topic").show();
+						})
+					)
+					// LOCK TOPIC
+					.append($("<span></span>")
+						.attr("class", "icon topic-lock icon-unlocked active")
+						.attr("title", "lock topic")
+					)
+				) // topic toolbox
+			) // topic header
+			.append("<span class='topic-svg'></span>")
+			.append($("<span></span>")
+				.attr("class", "topic-footer")
+				.append($("<input>")
+					.attr("type", "text")
+					.attr("class", "topic-word-input")
+					.keypress(function (event) {
+						if (event.which === 13) {
+							// If the user enters a word, add it to the topic
+							var word = $(this).val(),
+							topic = $(this).parents(".topic").attr("id");
+							addWord(word, topic);
+							$(this).val("");
+						}
+					}) // keypress
+				)						
+				.append($("<span></span>")
+					.attr("class","icon topic-edit-complete icon-checkmark active")
+					.attr("title", "done")
+					.on("click", function () {
+						$(this).parents(".topic-footer").removeClass("edit").removeClass("add");
+						var $header = $(this).parents(".topic").find(".topic-header");
+						$header.find(".topic-split").removeClass("selected");
+						$header.find(".add-word").removeClass("selected");
+					}) // click
+				)
+				.append($("<span></span>")
+					.attr("class", "topic-edit-instructions")
+				)
+			) // topic footer
+		);
+		// Render the topic
+		var g = new graph(topic);
+		topicGraphs[topic.id] = {"graph": g,
+								 "connections": topic.connections,
+								 "placed":false};
+		//renderTopic(topic);
+	});
 
 	// LAYOUT THE TOPICS
 	/*var numCols = 5,
@@ -221,34 +247,26 @@ $(document).ready(function () {
 		
 		
 	} */
-
-		//},
-		//failure: function (msg) {
-		//	console.log("failure: " + msg);
-		//}
-	//});
-
-		/*for (var term in topicmodeldata.TermCoFreqs) {
-			if (topic.indexOf(term) !== -1) {
-				for (var term2 in topicmodeldata.TermCoFreqs[term]) {
-					if (term !== term2) {
-											if (topic.indexOf(term2) !== -1) {
-						// Add an edge
-						edges.push({
-							"source":topic.indexOf(term),
-							"target":topic.indexOf(term2),
-							"value":topicmodeldata.TermCoFreqs[term][term2]
-						});
-					}
-					}
-
+	
+	
+	/*for (var term in topicmodeldata.TermCoFreqs) {
+		if (topic.indexOf(term) !== -1) {
+			for (var term2 in topicmodeldata.TermCoFreqs[term]) {
+				if (term !== term2) {
+										if (topic.indexOf(term2) !== -1) {
+					// Add an edge
+					edges.push({
+						"source":topic.indexOf(term),
+						"target":topic.indexOf(term2),
+						"value":topicmodeldata.TermCoFreqs[term][term2]
+					});
 				}
-			}
-		}*/
+				}
 
-		
-	//});
-});
+			}
+		}
+	}*/
+}
 
 function addWord(word, topic) {
 	topicGraphs[topic].addNode({"name":word, "value":100, "class":"new"}); 
