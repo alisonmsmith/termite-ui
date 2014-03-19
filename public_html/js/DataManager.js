@@ -1,4 +1,5 @@
 /**
+ * Create a data structure that holds "modelID" and "termLimit".
  * @constructor
  **/
 var DataManager = Backbone.Model.extend({
@@ -103,6 +104,7 @@ DataManager.prototype.readQueryString = function() {
 };
 
 /**
+ * Creates an UI for specifying topic model and the number of top terms per topic.
  * @constructor
  **/
 var DataManagerView = Backbone.View.extend({
@@ -120,6 +122,7 @@ DataManagerView.prototype.initialize = function() {
 	var modelIDs = this.model.get("modelIDs");
 	var termLimits = this.model.get("termLimits");
 	var container = d3.select(this.el);
+	container.html("Show model <select class='ModelID'></select> with top <select class='TermLimit'></select> terms.");
 	container.select("select.ModelID")
 		.on("change", function() { this.model.set("modelID", d3.event.target.value) }.bind(this))
 		.selectAll("option").data(modelIDs).enter().append("option")
