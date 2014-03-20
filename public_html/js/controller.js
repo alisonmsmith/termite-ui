@@ -14,16 +14,16 @@ function loadData(modelID, termLimit) {
 	if (!termLimit) {
 		termLimit = 10;
 	}
-	var url = "http://treetm.jcchuang.org/" + modelID + "/vis/GroupInABox?format=json&termLimit=" + termLimit;
+	var url = "http://termite.jcchuang.org/" + modelID + "/vis/GroupInABox?origin=http://127.0.0.1:8000&format=json&termLimit=" + termLimit;
+	console.log("[LOADING]", "URL", url);
 	$.ajax({
 		url: url,
 		success: function (data, msg) {
-			data = JSON.parse(data);
-			console.log("[LOAD]", "URL", url, "Results:", msg, "Data:", data);
+			console.log("[LOADED]", "URL", url, "Results:", msg, "Data:", data);
 			initGroupInABox(data);
 		},
 		error: function (data, msg) {
-			console.log("[LOAD]", "URL", url, "Results:", msg, "Data:", data);
+			console.log("[LOADED]", "URL", url, "Results:", msg, "Data:", data);
 		}
 	});
 }
