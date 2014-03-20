@@ -59,15 +59,17 @@ function initGroupInABox(data) {
 		// Determine the edges for each node
 		// TODO: a better data structure may make this more efficient
 		$.each(nodes, function (source, node) {
-			$.each(data.TermCoFreqs[node.name], function (term, value) {
-				if (value > 500 && term !== node.name) {
-					$.each(nodes, function (target, node2) {
-						if (term === node2.name) {
-							edges.push({"source":source, "target":target, "value":value});
-						}
-					});
-				}
-			});
+			if (data.TermCoFreqs.hasOwnProperty(node.name)) {
+				$.each(data.TermCoFreqs[node.name], function (term, value) {
+					if (value > 500 && term !== node.name) {
+						$.each(nodes, function (target, node2) {
+							if (term === node2.name) {
+								edges.push({"source":source, "target":target, "value":value});
+							}
+						});
+					}
+				});
+			}
 		})
 		topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "name":"TOPIC " + topic, "connections":connections});
 	}
