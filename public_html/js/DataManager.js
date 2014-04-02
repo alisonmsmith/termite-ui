@@ -10,7 +10,7 @@ var DataManager = Backbone.Model.extend({
 			"nsf1k_mallet",
 			"nsf10k_mallet",
 			"nsf25k_mallet",
-			"nsf127992_mallet",
+			"nsf146k_mallet",
 			"20newsgroups_mallet"
 		],
 		"termLimits" : [ 5, 7, 10, 15, 20 ] 

@@ -14,7 +14,7 @@ function loadData(modelID, termLimit) {
 	if (!termLimit) {
 		termLimit = 10;
 	}
-	var url = "http://termite.jcchuang.org/" + modelID + "/vis/GroupInABox?origin=http://127.0.0.1:8000&format=json&termLimit=" + termLimit;
+	var url = "http://termite.jcchuang.org/" + modelID + "/vis/GroupInABox?origin=http://homes.cs.washington.edu&format=json&termLimit=" + termLimit;
 	console.log("[LOADING]", "URL", url);
 	$.ajax({
 		url: url,
