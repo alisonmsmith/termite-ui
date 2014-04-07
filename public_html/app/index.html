@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" ng-app="termite">
+<head>
+  <meta charset="utf-8">
+  <title>TERMITE</title>
+
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <div class="header">
+    <span class="ui-title"><span class="dark">TERMITE</span><span class="subtitle"> | interactive topic modeling</span></span>
+  </div>
+  <div id="data-manager" ng-controller="DataManager">
+    Show model 
+    <select ng-model="topicModel" ng-options="t in topicModels"></select>
+    with top
+    <select ng-model="termLimit" ng-options="t in termLimits"></select>
+    terms
+    <div class="button" ng-click="refresh()"> > </div>
+  </div>
+  <div id="GIB" ng-controller="TopicModelViewer">
+    <div id="topics">
+      <span class="topic" id="{{t.id}}" ng-repeat="t in topics">
+        <span class="topic-header {{modes[t.id].edit}}">
+          <span class="topic-name">{{t.name}}</span>
+          <input ng-if="{{modes[t.id].edit === 'edit'}}" type="text" ng-model="t.name">
+          <span class="icon topic-edit icon-wrench active {{modes[t.id]}}" title="edit topic" ng-click="swapMode(mode[t.id].edit)">
+          <span ng-if="{{modes[t.id].edit === 'edit'}}" class="topic-toolbox">
+            <span class="icon icon-plus {{modes[t.id].addWord}}" title="add word(s) to the topic"></span>
+            <span class="icon icon-scissors {{modes[t.id].removeWord}}" title="remove word(s) from the topic" ng-click="removeWords(t.id)"></span>
+            <span class="icon icon-trash {{modes[t.id].trashWord}}" title="add word(s) to the global stop words list" ng-click="addToStopWords(t.id)"></span>
+            </span>
+          </span>
+        </span>
+        <!-- this should be a directive -->
+        <span class="topic-svg"></span>
+        <span ng-if="{{modes[t.id] === 'edit'}}"class="topic-footer">
+          <input type="text">
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+  -->
+  <script src="../bower_components/angular/angular.js"></script>
+  <script src="../bower_components/angular-route/angular-route.js"></script>
+  <script src="../bower_components/jquery/dist/jquery.js"></script>
+  <script src="../bower_components/d3/d3.js"></script>
+  <script src="../bower_components/backbone/backbone.js"></script>
+  <script src="../bower_components/underscore/underscore.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+  <script src="js/controllers.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/directives.js"></script> 
+</body>
+</html>
