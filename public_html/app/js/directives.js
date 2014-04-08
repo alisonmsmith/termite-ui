@@ -6,10 +6,14 @@
 angular.module('termite.directives', []).
   directive('topicGraph', [function() {
     return {
-    	restrict: 'A',
+    	restrict: 'E',
+    	scope: {
+    		topic: "="
+    	},
     	link: function(scope, elm, attrs) {
+    			var topic = scope.topic;
       		var width = 225,
-	    			height = 225;
+	    				height = 225;
 
 	  		  var color = d3.scale.category20();
 
@@ -21,13 +25,23 @@ angular.module('termite.directives', []).
 	        	.on("drag", dragmove)
 	        	.on("dragend", dragend);
 
-			    function dragmove(d, i) {
-			        d.px += d3.event.dx;
-			        d.py += d3.event.dy;
-			        d.x += d3.event.dx;
-			        d.y += d3.event.dy; 
-			        tick(); // this is the key to make it work together with updating both px,py,x,y on d !
-			    }
+	    function dragstart(d, i) {
+	      //  force.stop() // stops the force auto positioning before you start dragging
+	    }
+
+	    function dragmove(d, i) {
+	        d.px += d3.event.dx;
+	        d.py += d3.event.dy;
+	        d.x += d3.event.dx;
+	        d.y += d3.event.dy; 
+	        tick(); // this is the key to make it work together with updating both px,py,x,y on d !
+	    }
+
+	    function dragend(d, i) {
+	        d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
+	        tick();
+	       // force.resume();
+	    }
 
 				  //TODO: should the force directed layout take edge weight into account? 
 				  var force = d3.layout.force()
@@ -38,21 +52,21 @@ angular.module('termite.directives', []).
 				      //.linkStrength(function (d) { return Math.min(d.value/1000, 1); })
 				      .size([width, height]);
 
-	  var svg = d3.select("#" + topic.id).append("svg")
-	      .attr("width", width)
-	      .attr("height", height);
+				  var svg = d3.select(elm[0]).append("svg")
+				      .attr("width", width)
+				      .attr("height", height);
 
 	  
-	    force
-	        .nodes(topic.nodes)
-	        .links(topic.edges)
-	        .start();
+			    force
+			        .nodes(topic.nodes)
+			        .links(topic.edges)
+			        .start();
 
-	    var link = svg.selectAll(".link")
-	         .data(topic.edges)
-	         .enter().append("line")
-	         .attr("class", "link");
-	        // .style("stroke-width", function(d) { return Math.sqrt(d.value/100); });
+			    var link = svg.selectAll(".link")
+			         .data(topic.edges)
+			         .enter().append("line")
+			         .attr("class", "link");
+			        // .style("stroke-width", function(d) { return Math.sqrt(d.value/100); });
 
 	      var node = svg.selectAll("g.node")
 	          .data(topic.nodes)
@@ -64,37 +78,39 @@ angular.module('termite.directives', []).
 	      // Toggle Select
 	      .on( "click", function (d) { d3.select(this).classed({"selected": true}) });
 
-	    var circle = node.append("circle")
-	        .attr("class", "circle")
-	        .attr("r", function (d) { return Math.min(d.value/10, 40) + "px"; })
-	        .call(nodedrag);
+		    var circle = node.append("circle")
+		        .attr("class", "circle")
+		        .attr("r", function (d) { return Math.min(d.value/10, 40) + "px"; })
+		        .call(nodedrag);
 
-	    var label = node.append("text")
-	        .attr("class", "term")
-	        .text(function(d) { return d.name})
-	        .attr("text-anchor", "middle")
-	        .call(nodedrag);
+		    var label = node.append("text")
+		        .attr("class", "term")
+		        .text(function(d) { return d.name})
+		        .attr("text-anchor", "middle")
+		        .call(nodedrag);
 
-	    node.append("title")
-	        .text(function(d) { return d.name; });
+		    node.append("title")
+		        .text(function(d) { return d.name; });
 
 
-	    var n = 100;
-	    force.start();
-	      for (var i = n * n; i > 0; --i) force.tick();
-	      force.stop();
+		    var n = 100;
+		    force.start();
+		      for (var i = n * n; i > 0; --i) force.tick();
+		      force.stop();
 
-	    tick();
+		    tick();
 
-	    function tick() {
-	            link.attr("x1", function(d) { return d.source.x; })
-	              .attr("y1", function(d) { return d.source.y; })
-	              .attr("x2", function(d) { return d.target.x; })
-	              .attr("y2", function(d) { return d.target.y; });
+		    function tick() {
+		            link.attr("x1", function(d) { return d.source.x; })
+		              .attr("y1", function(d) { return d.source.y; })
+		              .attr("x2", function(d) { return d.target.x; })
+		              .attr("y2", function(d) { return d.target.y; });
 
-	          node.attr("transform", function(d) { 
-	            return 'translate(' + [d.x, d.y] + ')'; 
-	          });  
-	    }
-    	};
-  }]);
+		          node.attr("transform", function(d) { 
+		            return 'translate(' + [d.x, d.y] + ')'; 
+		          });  
+		    }
+    	} // link
+  	}
+  }
+ ]);

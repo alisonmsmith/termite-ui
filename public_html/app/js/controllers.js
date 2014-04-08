@@ -6,7 +6,7 @@ angular.module('termite.controllers', [])
   /**
   * Controller for Loading Data Sets
   */
-  .controller('DataManager', [function($scope, TopicModelService) {
+  .controller('DataManager', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
 	  $scope.topicModels = [
 	      "nsf1k_mallet",
 	      "nsf10k_mallet",
@@ -17,35 +17,37 @@ angular.module('termite.controllers', [])
 	  $scope.topicModel = $scope.topicModels[0];
 
 	  $scope.termLimits = [ 5, 7, 10, 15, 20 ];
-	  $scope.termLimit = $scope.termLmits[2];
+	  $scope.termLimit = $scope.termLimits[2];
 
 	  $scope.refresh = function () {
 	    TopicModelService.getTopicModel($scope.topicModel, $scope.termLimit);
 	  };
+
+	  $scope.refresh();
   }])
   /**
   *	Controller for the Main Topic Model View
   */
-  .controller('TopicModelViewer', [function($scope, TopicModelService) {
+  .controller('TopicModelViewer', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
 	  $scope.topics = [];
-	  $scope.layout = twentytopiclayout;
+	//  $scope.layout = twentytopiclayout;
 	  $scope.topicModel = null;
 
 	  $scope.modes = {}; 
 
-	  $scope.$on("topic-model-loaded") = function () {
+	  $scope.$on("topic-model-loaded", function () {
 	    $scope.topicModel = TopicModelService.topicModel;
 	    processData();
-	  }
+	  });
 
 		/**
 		* Swap between the default and edit mode for the topic
 		*/
 	  $scope.swapTopicMode = function (mode) {
-	  	if (mode === "edit") {
-	  		mode = "default";
+	  	if (mode) {
+	  		mode = false;
 	  	} else {
-	  		mode = "edit";
+	  		mode = true;
 	  	}
 	  }
 
@@ -93,13 +95,21 @@ angular.module('termite.controllers', [])
 	          });
 	        }
 	      })
-	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "name":"TOPIC " + topic, "connections":connections});
+	      var m = {"edit":false, "addWord":"active", "removeWord":"inactive", "trashWord":"inactive"};
+	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "mode":m, "name":"TOPIC " + topic, "connections":connections});
 	    	
 	      // initialize the mode for each topic view to default
-	    	$scope.modes[getTopicId(topic)] = "default";
+	    
 	    }
 
-	    renderTopicModel();
+	    //renderTopicModel();
+	  //  addSVGs();
+	  }
+
+	  function addSVGs() {
+	  	$.each($scope.topics, function (i, t) {
+	  		renderTopic(t);
+	  	});
 	  }
 
 	  function renderTopicModel() {
@@ -348,7 +358,7 @@ angular.module('termite.controllers', [])
 	      //.linkStrength(function (d) { return Math.min(d.value/1000, 1); })
 	      .size([width, height]);
 
-	  var svg = d3.select("#" + topic.id).append("svg")
+	  var svg = d3.select("#svg-" + topic.id).append("svg")
 	      .attr("width", width)
 	      .attr("height", height);
 
@@ -407,6 +417,6 @@ angular.module('termite.controllers', [])
 	          });  
 	    }
 
-	  topicGraphs[topic] = svg;
+	 // topicGraphs[topic] = svg;
 	  }
   }]);

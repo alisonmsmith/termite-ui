@@ -29,6 +29,16 @@ body {
   .node.hovered .circle {
     fill: #1abc9c; }
 
+#refresh-model {
+  display: inline-block;
+  padding: 5px;
+  color: #1abc9c;
+  border: solid 1px #1abc9c;
+  cursor: pointer; }
+  #refresh-model:hover {
+    color: #ecf0f1;
+    background-color: #1abc9c; }
+
 .term {
   user-select: none;
   -webkit-user-select: none;
@@ -47,7 +57,7 @@ body {
 .topic {
   width: 225px;
   height: 225px;
-  position: absolute;
+  float: left;
   border: solid 1px #34495e;
   margin: 5px; }
 

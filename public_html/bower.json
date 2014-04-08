@@ -1,9 +1,8 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
+  "name": "termite-ui",
+  "description": "A topic model visualization to support interactive topic modeling",
   "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
-  "license": "MIT",
+  "homepage": "https://github.com/alisonmsmith/termite-ui",
   "private": true,
   "dependencies": {
     "angular": "1.2.x",
@@ -11,7 +10,6 @@
     "angular-loader": "1.2.x",
     "angular-mocks": "~1.2.15",
     "jquery":"",
-    "d3":"",
-    "backbone":""
+    "d3":""
   }
 }

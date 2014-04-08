@@ -8,9 +8,9 @@ launch_browser() {
 		echo
 		echo "Opening http://127.0.0.1:8000 in Google Chrome..."
 		echo
-		open -a Google\ Chrome "http://127.0.0.1:8000/index.html"
+		open -a Google\ Chrome "http://127.0.0.1:8000/app/index.html"
 	else
-		echo "The group-in-a-box visualization is now available at http://127.0.0.1:8000"
+		echo "The group-in-a-box visualization is now available at http://127.0.0.1:8000/app"
 	fi
 }
 

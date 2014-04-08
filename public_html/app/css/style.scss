@@ -96,6 +96,20 @@ body {
 	}
 }
 
+#refresh-model {
+	display: inline-block;
+	padding: 5px;
+	color: $turquoise;
+	border: solid 1px $turquoise;
+	cursor: pointer;
+
+		
+	&:hover {
+		color:$clouds;
+background-color:$turquoise;
+	}
+}
+
 .term {
 	@include universal-not-select();
 	fill: $wetasphalt;
@@ -118,8 +132,8 @@ $topicheight: 225px;
 .topic {
 	width: $topicwidth;
 	height: $topicheight;
-	//float: left;
-	position: absolute;
+	float: left;
+	//position: absolute;
 	border: solid 1px $wetasphalt;
 	margin: 5px;
 }
