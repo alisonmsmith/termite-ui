@@ -28,7 +28,7 @@ angular.module('termite.controllers', [])
   /**
   *	Controller for the Main Topic Model View
   */
-  .controller('TopicModelViewer', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
+  .controller('TopicModelViewer', ['$rootScope', '$scope', 'TopicModelService', function($rootScope, $scope, TopicModelService) {
 	  $scope.topics = [];
 	//  $scope.layout = twentytopiclayout;
 	  $scope.topicModel = null;
@@ -37,18 +37,30 @@ angular.module('termite.controllers', [])
 
 	  $scope.$on("topic-model-loaded", function () {
 	    $scope.topicModel = TopicModelService.topicModel;
+
+	    // resest the topic list
+	    $scope.topics = [];
+
 	    processData();
 	  });
+
+	 $scope.addWord = function (t) {
+	  	t.nodes.push({"name":t.addedWord, "value":100, "class":"new"}); 
+	  	//$rootScope.$broadcast(t.id + ":update");
+	  	$scope.$broadcast(t.id + ":update");
+	  };
 
 		/**
 		* Swap between the default and edit mode for the topic
 		*/
-	  $scope.swapTopicMode = function (mode) {
-	  	if (mode) {
-	  		mode = false;
-	  	} else {
-	  		mode = true;
+	  $scope.swapTopicMode = function (type, topic) {
+
+	  	if (type === "edit") {
+	  		topic.mode.edit = !topic.mode.edit;
+	  	} else if (type === "add") {
+	  		topic.mode.addWord = !topic.mode.addWord;
 	  	}
+
 	  }
 
 	  function getTopicId(id) {
@@ -95,7 +107,7 @@ angular.module('termite.controllers', [])
 	          });
 	        }
 	      })
-	      var m = {"edit":false, "addWord":"active", "removeWord":"inactive", "trashWord":"inactive"};
+	      var m = {"edit":false, "addWord":false, "removeWord":false, "trashWord":false};
 	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "mode":m, "name":"TOPIC " + topic, "connections":connections});
 	    	
 	      // initialize the mode for each topic view to default
@@ -103,13 +115,6 @@ angular.module('termite.controllers', [])
 	    }
 
 	    //renderTopicModel();
-	  //  addSVGs();
-	  }
-
-	  function addSVGs() {
-	  	$.each($scope.topics, function (i, t) {
-	  		renderTopic(t);
-	  	});
 	  }
 
 	  function renderTopicModel() {
@@ -308,9 +313,7 @@ angular.module('termite.controllers', [])
 	  }*/
 	}
 
-	function addWord(word, topic) {
-	  topicGraphs[topic].addNode({"name":word, "value":100, "class":"new"}); 
-	}
+
 
 
 

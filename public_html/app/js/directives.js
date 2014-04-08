@@ -3,14 +3,33 @@
 /* Directives */
 
 
-angular.module('termite.directives', []).
-  directive('topicGraph', [function() {
+angular.module('termite.directives', [])
+	.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.ngEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    }
+  })
+  .directive('topicGraph', [function() {
     return {
     	restrict: 'E',
     	scope: {
     		topic: "="
     	},
     	link: function(scope, elm, attrs) {
+    		// listen for an update event for this topic
+    		scope.$on(scope.topic.id + ":update", function (event, data) { 
+    			console.log('update this topic: ' + scope.topic.id);
+    		});
+
+
     			var topic = scope.topic;
       		var width = 225,
 	    				height = 225;

@@ -23,21 +23,21 @@
   <div id="GIB" ng-controller="TopicModelViewer">
     <div id="topics">
       <span class="topic" id="{{t.id}}" ng-repeat="t in topics">
-        <span class="topic-header" ng-class="{edit: $topic.mode.edit}">
+        <!-- this should be a view or a directive? -->
+        <span class="topic-header" ng-class="{edit: t.mode.edit}">
           <span class="topic-name">{{t.name}}</span>
           <input ng-show="t.mode.edit" type="text" ng-model="t.name">
-          <span class="icon topic-edit icon-wrench active" ng-class="{selected: $topic.mode.edit}" title="edit topic" ng-click="swapTopicMode(t.mode.edit)">
+          <span class="icon topic-edit icon-wrench active" ng-class="{selected: t.mode.edit}" title="edit topic" ng-click="swapTopicMode('edit', t)"></span>
           <span ng-show="t.mode.edit" class="topic-toolbox">
-            <span class="icon icon-plus" ng-class="{selected: $topic.mode.addWord}" title="add word(s) to the topic"></span>
-            <span class="icon icon-scissors" ng-class="{selected: $topic.mode.removeWord}" title="remove word(s) from the topic" ng-click="removeWords(t.id)"></span>
-            <span class="icon icon-trash" ng-class="{selected: $topic.mode.trashWord}" title="add word(s) to the global stop words list" ng-click="addToStopWords(t.id)"></span>
-            </span>
+            <span class="icon icon-plus" ng-class="{active: t.mode.edit, selected: t.mode.addWord}" title="add word(s) to the topic" ng-click="swapTopicMode('add', t)"></span>
+            <span class="icon icon-scissors" ng-class="{active: t.mode.removeWord}" title="remove word(s) from the topic" ng-click="removeWords(t.id)"></span>
+            <span class="icon icon-trash" ng-class="{active: t.mode.trashWord}" title="add word(s) to the global stop words list" ng-click="addToStopWords(t.id)"></span>
           </span>
         </span>
         <!-- this should be a directive -->
         <topic-graph topic="t"></topic-graph>
-        <span ng-show="t.mode.edit" class="topic-footer">
-          <input type="text">
+        <span ng-show="t.mode.addWord" class="topic-footer">
+          <input ng-show="t.mode.addWord" type="text" ng-model="t.addedWord" ng-enter="addWord(t)" >
         </span>
       </span>
     </div>
