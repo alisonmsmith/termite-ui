@@ -6,7 +6,7 @@ angular.module('termite.controllers', [])
   /**
   * Controller for Loading Data Sets
   */
-  .controller('DataManager', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
+  .controller('DatasetController', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
 	  $scope.topicModels = [
 	      "nsf1k_mallet",
 	      "nsf10k_mallet",
@@ -19,7 +19,14 @@ angular.module('termite.controllers', [])
 	  $scope.termLimits = [ 5, 7, 10, 15, 20 ];
 	  $scope.termLimit = $scope.termLimits[2];
 
+	  $scope.$on("topic-model-loaded", function () {
+    	$("#loader").hide();
+	  });
+
 	  $scope.refresh = function () {
+	  	// show the loader
+    	$("#loader").show();
+
 	    TopicModelService.getTopicModel($scope.topicModel, $scope.termLimit);
 	  };
 
@@ -28,8 +35,9 @@ angular.module('termite.controllers', [])
   /**
   *	Controller for the Main Topic Model View
   */
-  .controller('TopicModelViewer', ['$rootScope', '$scope', 'TopicModelService', function($rootScope, $scope, TopicModelService) {
+  .controller('TopicModelViewController', ['$rootScope', '$scope', 'TopicModelService', function($rootScope, $scope, TopicModelService) {
 	  $scope.topics = [];
+	  $scope.model = {};
 	//  $scope.layout = twentytopiclayout;
 	  $scope.topicModel = null;
 
@@ -44,11 +52,105 @@ angular.module('termite.controllers', [])
 	    processData();
 	  });
 
-	 $scope.addWord = function (t) {
-	  	t.nodes.push({"name":t.addedWord, "value":100, "class":"new"}); 
-	  	//$rootScope.$broadcast(t.id + ":update");
+	  $scope.$on("node-selected", function (event, topic) {
+	  	//$scope.setTopicMode("remove", topic, true);
+	  });
+
+	  $scope.continue = function () {
+	  	console.log("continue processing");
+	  	// continue on to the next iteration
+	  	TopicModelService.continueITM();
+	  };
+
+	  $scope.addToStopWords = function (t) {
+	  	if (t.selectedWords.length === 0) {
+	  		console.log('no selected words to add to stop words list');
+	  	}
+	  	var toRemove = [];
+	  	angular.forEach(t.selectedWords, function (selected) {
+	  		// remove the word from the  nodes list and therefore the visualization
+	  		angular.forEach(t.nodes, function (node, index) {
+	  			if (node.name === selected.name) {
+	  				//node.class = "trash";
+	  				toRemove.push(node);
+
+	  				// add the word to the trashed list
+	  				$scope.model[t.id].trashed.push(node.name);
+
+	  				// remove the word from the existing list
+	  				var index = $scope.model[t.id].existing.indexOf(node.name);
+	  				if (index !== -1) {
+	  					$scope.model[t.id].existing.splice(index, 1);
+	  				}
+	  			}
+	  		});
+	  	});
+	  	angular.forEach(toRemove, function (node) {
+	  		var index = t.nodes.indexOf(node);
+	  		if (index !== -1) {
+	  			t.nodes.splice(index, 1);
+	  		}
+	  	});
+	  	t.selectedWords = [];
+	  	//$rootScope.$broadcast("trashWord", {"word":node.name, "topic":t.id} );
 	  	$scope.$broadcast(t.id + ":update");
 	  };
+
+	  $scope.removeWords = function (t) {
+	  	if (t.selectedWords.length === 0) {
+	  		console.log('no selected words to remove');
+	  	}
+
+	  	var toRemove = [];
+	  	angular.forEach(t.selectedWords, function (selected) {
+	  		// remove the word from the  nodes list or color the word 'to be removed'
+	  		angular.forEach(t.nodes, function (node) {
+	  			if (node.name === selected.name) {
+	  				//node.class = "remove";
+	  				toRemove.push(node);
+	  				$scope.model[t.id].removed.push(node.name);
+
+	  				var index = $scope.model[t.id].existing.indexOf(node.name);
+	  				if (index !== -1) {
+	  					$scope.model[t.id].existing.splice(index, 1);
+	  				}
+	  				
+	  			}
+	  		});
+	  	});
+	  	angular.forEach(toRemove, function (node) {
+	  		var index = t.nodes.indexOf(node);
+	  		// technically the viz should probably be in charge of removing the nodes and the links
+	  		if (index !== -1) {
+	  			t.nodes.splice(index, 1);
+	  		}
+	  		t.edges.filter(function(edge) {
+	  			return edge.source
+	  		});
+	  	});
+	  	t.selectedWords = [];
+	  	
+	  	//$rootScope.$broadcast("removeWord", {"word":node.name, "topic":t.id} );
+	  	$scope.$broadcast(t.id + ":update");
+	  };
+
+	 $scope.addWord = function (t) {
+	 	console.log("added " + t.addedWord + " to topic " + t.id);
+	  	t.nodes.push({"name":t.addedWord, "value":100, "class":"new"}); 
+	  	$scope.model[t.id].added.push(t.addedWord);
+	  //	$rootScope.$broadcast("addWord", {"word":t.addedWord, "topic":t.id} );
+	  	$scope.$broadcast(t.id + ":update");
+
+	  	// clear the input
+	  	t.addedWord = "";
+	  };
+
+	  $scope.setTopicMode = function (type, topic, bool) {
+	  	if (type === "remove") {
+	  		topic.mode.removeWord = bool;
+	  		topic.mode.trashWord = bool;
+	  	}
+	  }
 
 		/**
 		* Swap between the default and edit mode for the topic
@@ -70,6 +172,7 @@ angular.module('termite.controllers', [])
 	  function processData() {
 	    var counter = 0;
 	    for (var topic in $scope.topicModel.TopTermsPerTopic) {
+	    	$scope.model[getTopicId(topic)] = {"existing":[], "removed":[], "added":[], "trashed":[]};
 	      var nodes = [];
 	      var edges = [];
 	      var connections = [];
@@ -89,6 +192,7 @@ angular.module('termite.controllers', [])
 	      $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
 	        // TODO: I really don't like how this is being stored in the JSON... 
 	        for (var k in term) {
+	        	$scope.model[getTopicId(topic)].existing.push(k);
 	          nodes.push({"name":k, "value":term[k], "class":"existing"});
 	        }
 	      });
@@ -100,15 +204,16 @@ angular.module('termite.controllers', [])
 	            if (value > 500 && term !== node.name) {
 	              $.each(nodes, function (target, node2) {
 	                if (term === node2.name) {
-	                  edges.push({"source":source, "target":target, "value":value});
+	                  edges.push({"source":node, "target":node2, "value":value});
 	                }
 	              });
 	            }
 	          });
 	        }
 	      })
-	      var m = {"edit":false, "addWord":false, "removeWord":false, "trashWord":false};
-	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), "mode":m, "name":"TOPIC " + topic, "connections":connections});
+	      var m = {"edit":false, "addWord":false, "removeWord":true, "trashWord":true};
+	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), 
+	      	"mode":m, "name":"TOPIC " + topic, "connections":connections, "selectedWords":[]});
 	    	
 	      // initialize the mode for each topic view to default
 	    
@@ -117,309 +222,5 @@ angular.module('termite.controllers', [])
 	    //renderTopicModel();
 	  }
 
-	  function renderTopicModel() {
-
-	  
-	  // Add new DIVs
-	  $.each(topics, function (index, topic) {
-	    // Add a div to the html
-	    $("#topics").append($("<span></span>")
-	      .attr("class", "topic")
-	      .attr("id", topic.id)
-	      //.append("<span class='topic-cue'></span>")
-	      .append($("<span></span>")
-	        .attr("class", "topic-header")
-	        .append($("<span></span>")
-	          .html(topic.name)
-	          .attr("class", "topic-name")
-	        )
-	        .append($("<input>")
-	          .attr("type", "text")
-	          .attr("class", "topic-name-input")
-	          //.attr("placeholder", function () { return $(this).parent().find(".topic-name").text(); })
-	          .on("click", function () {
-	            return false;
-	          }) // click
-	          .keypress(function (event) {
-	            if (event.which === 13) {
-	              // If the user enters a new name, swap it for the topic name
-	              var val = $(this).val();
-	              if (val === "") {
-	                val = $(this).attr("placeholder");
-	              }
-	              $(this).parents(".topic-header").removeClass("selected").removeClass("edit").find(".topic-name").html(val);
-	            }
-	          }) // keypress
-	         )
-	        .append($("<span></span>")
-	          .attr("class", "icon topic-edit icon-wrench active")
-	          .attr("title", "edit topic")
-	          .on("click", function () {
-	            // If the wrench is clicked, enter or exit edit mode 
-	            
-	            var $header =  $(this).parents(".topic-header");
-	            if ($header.hasClass("edit")) {
-	              $(this).removeClass("selected");
-	              var val = $header.find(".topic-name-input").val();
-	              if (val === "") {
-	                val = $header.find(".topic-name-input").attr("placeholder");
-	              }
-	              $header.removeClass("edit").find(".topic-name").html(val);
-	            } else {
-	              $(this).addClass("selected");
-	              var name = $header.addClass("edit").find(".topic-name").text();
-	              $header.find(".topic-name-input").attr("placeholder", name).focus();
-	            }
-
-	          })
-	        )
-	        .append($("<span></span>")
-	          .attr("class", "topic-toolbox")
-	          // ADD WORD TO TOPIC
-	          .append($("<span></span>")
-	            .attr("class", "icon add-word icon-plus active")
-	            .attr("title", "add words to the topic")
-	            .on("click", function () {
-	              $(this).addClass("selected");
-	              $(this).parents(".topic").find(".topic-footer").addClass("add").find(".topic-word-input").focus();
-	            })
-	          )
-	          // REMOVE WORD FROM TOPIC
-	          .append($("<span></span>")
-	            .attr("class", "icon remove-word icon-scissors inactive")
-	            .attr("title", "remove word from topic")
-
-	          )
-	          // SPLIT TOPIC
-	          .append($("<span></span>")
-	            .attr("class", "icon topic-split icon-fork active")
-	            .attr("title", "split topic")
-	            .on("click", function () {
-	              $(this).addClass("selected");
-	              $(this).parents(".topic").find(".topic-footer").addClass("edit").find(".topic-edit-instructions").html("select the terms for the new topic").show();
-	            })
-	          )
-	          // LOCK TOPIC
-	          .append($("<span></span>")
-	            .attr("class", "icon topic-lock icon-unlocked active")
-	            .attr("title", "lock topic")
-	          )
-	        ) // topic toolbox
-	      ) // topic header
-	      .append("<span class='topic-svg'></span>")
-	      .append($("<span></span>")
-	        .attr("class", "topic-footer")
-	        .append($("<input>")
-	          .attr("type", "text")
-	          .attr("class", "topic-word-input")
-	          .keypress(function (event) {
-	            if (event.which === 13) {
-	              // If the user enters a word, add it to the topic
-	              var word = $(this).val(),
-	              topic = $(this).parents(".topic").attr("id");
-	              addWord(word, topic);
-	              $(this).val("");
-	            }
-	          }) // keypress
-	        )           
-	        .append($("<span></span>")
-	          .attr("class","icon topic-edit-complete icon-checkmark active")
-	          .attr("title", "done")
-	          .on("click", function () {
-	            $(this).parents(".topic-footer").removeClass("edit").removeClass("add");
-	            var $header = $(this).parents(".topic").find(".topic-header");
-	            $header.find(".topic-split").removeClass("selected");
-	            $header.find(".add-word").removeClass("selected");
-	          }) // click
-	        )
-	        .append($("<span></span>")
-	          .attr("class", "topic-edit-instructions")
-	        )
-	      ) // topic footer
-	    );
-	    // Render the topic
-	    var g = new graph(topic);
-	    topicGraphs[topic.id] = {"graph": g,
-	                 "connections": topic.connections,
-	                 "placed":false};
-	    //renderTopic(topic);
-	  });
-
-	  // LAYOUT THE TOPICS
-	  /*var numCols = 5,
-	    numRows = data.TopTermsPerTopic.length/numCols,
-	    layout = [[]];
-
-	  for (var j=0; j<numRows; j++) {
-	    for (var k=0; k<numCols; k++) {
-	      layout[j][k] = undefined;
-	    }
-	  } */
-
-	  topics.sort(function (a, b) {
-	    if (a.connections.length > b.connections.length) {
-	      return -1;
-	    } 
-	    if (a.connections.length < b.connections.length) {
-	      return 1;
-	    }
-	    return 0;
-	  });
-
-	  for (var i=0; i<topics.length; i++) {
-	    topicGraphs[topics[i].id].graph.layout(layout[i]);
-	  }
-
-	  /*var count = 0;
-	  while (count < data.TopTermsPerTopic.length) {
-	    // find the most connected remaining topic
-	    var max = 0;
-	    var connectedTopic = null;
-	    for (var topic in topicGraphs) {
-	      if (!topic.placed) {
-	        if (topic.connections.length > max) {
-	          connectedTopic = topic;
-	        }
-	      }
-	    }
-
-	    //place the connected topic in the center
-	    //placeAt(numRows/2, numCols/2, connectedTopic);
-	    //topicGraphs[connectedTopic.id].placed = true;
-	    //count ++;
-
-	    // place the connections around the center
-	    
-	    
-	  } */
-	  
-	  
-	  /*for (var term in topicmodeldata.TermCoFreqs) {
-	    if (topic.indexOf(term) !== -1) {
-	      for (var term2 in topicmodeldata.TermCoFreqs[term]) {
-	        if (term !== term2) {
-	                    if (topic.indexOf(term2) !== -1) {
-	          // Add an edge
-	          edges.push({
-	            "source":topic.indexOf(term),
-	            "target":topic.indexOf(term2),
-	            "value":topicmodeldata.TermCoFreqs[term][term2]
-	          });
-	        }
-	        }
-
-	      }
-	    }
-	  }*/
-	}
-
-
-
-
-
-
-
-	function renderTopic(topic) {
-	  var width = 225,
-	    height = 225;
-
-	  var color = d3.scale.category20();
-
-	  var k = Math.sqrt(topic.nodes.length / (width * height));
-	  var d = 2*topic.edges.length/(topic.nodes.length*(topic.nodes.length-1));
-
-	    var nodedrag = d3.behavior.drag()
-	        .on("dragstart", dragstart)
-	        .on("drag", dragmove)
-	        .on("dragend", dragend);
-
-	    function dragstart(d, i) {
-	      //  force.stop() // stops the force auto positioning before you start dragging
-	    }
-
-	    function dragmove(d, i) {
-	        d.px += d3.event.dx;
-	        d.py += d3.event.dy;
-	        d.x += d3.event.dx;
-	        d.y += d3.event.dy; 
-	        tick(); // this is the key to make it work together with updating both px,py,x,y on d !
-	    }
-
-	    function dragend(d, i) {
-	        d.fixed = true; // of course set the node to fixed so the force doesn't include the node in its auto positioning stuff
-	        tick();
-	       // force.resume();
-	    }
-
-
-	  //TODO: should the force directed layout take edge weight into account? 
-	  var force = d3.layout.force()
-	      .charge(-10 / k)
-	      .gravity(80 * k)
-	      // a denser graph needs the nodes to be pushed further away
-	      .linkDistance(Math.min(Math.max(50, 200*d), 200))
-	      //.linkStrength(function (d) { return Math.min(d.value/1000, 1); })
-	      .size([width, height]);
-
-	  var svg = d3.select("#svg-" + topic.id).append("svg")
-	      .attr("width", width)
-	      .attr("height", height);
-
-	  
-	    force
-	        .nodes(topic.nodes)
-	        .links(topic.edges)
-	        .start();
-
-	    var link = svg.selectAll(".link")
-	         .data(topic.edges)
-	         .enter().append("line")
-	         .attr("class", "link");
-	        // .style("stroke-width", function(d) { return Math.sqrt(d.value/100); });
-
-	      var node = svg.selectAll("g.node")
-	          .data(topic.nodes)
-	          .enter().append("g")
-	      .attr("class", function(d) { return "node node__"+d.name })
-	      // Highlight all matching term nodes
-	      .on( "mouseover", function(d) { d3.selectAll("g.node__"+d.name).classed({"hovered":true}); })//.style("fill", "#2ECC71").style("stroke", "#2ECC71") })
-	      .on( "mouseout", function(d) { d3.selectAll("g.node__"+d.name).classed({"hovered":false}); })//.style("fill", null).style("stroke", null) })
-	      // Toggle Select
-	      .on( "click", function (d) { d3.select(this).classed({"selected": true}) });
-
-	    var circle = node.append("circle")
-	        .attr("class", "circle")
-	        .attr("r", function (d) { return Math.min(d.value/10, 40) + "px"; })
-	        .call(nodedrag);
-
-	    var label = node.append("text")
-	        .attr("class", "term")
-	        .text(function(d) { return d.name})
-	        .attr("text-anchor", "middle")
-	        .call(nodedrag);
-
-	    node.append("title")
-	        .text(function(d) { return d.name; });
-
-
-	    var n = 100;
-	    force.start();
-	      for (var i = n * n; i > 0; --i) force.tick();
-	      force.stop();
-
-	    tick();
-
-	    function tick() {
-	            link.attr("x1", function(d) { return d.source.x; })
-	              .attr("y1", function(d) { return d.source.y; })
-	              .attr("x2", function(d) { return d.target.x; })
-	              .attr("y2", function(d) { return d.target.y; });
-
-	          node.attr("transform", function(d) { 
-	            return 'translate(' + [d.x, d.y] + ')'; 
-	          });  
-	    }
-
-	 // topicGraphs[topic] = svg;
-	  }
+	 
   }]);

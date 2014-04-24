@@ -12,7 +12,7 @@
   <div class="header">
     <span class="ui-title"><span class="dark">TERMITE</span><span class="subtitle"> | interactive topic modeling</span></span>
   </div>
-  <div id="data-manager" ng-controller="DataManager">
+  <div id="data-manager" ng-controller="DatasetController">
     Show model 
     <select ng-model="topicModel" ng-options="t for t in topicModels"></select>
     with top
@@ -20,24 +20,31 @@
     terms
     <div class="button" id="refresh-model" ng-click="refresh()"> > </div>
   </div>
-  <div id="GIB" ng-controller="TopicModelViewer">
+
+
+    <div id="loader" class="ui-loader" style="display:none;">loading...</div>
+
+  <!-- GIB -->
+  <div id="GIB" ng-controller="TopicModelViewController">
+    <div id="itm-continue-button" ng-click="continue()">continue</div>
     <div id="topics">
       <span class="topic" id="{{t.id}}" ng-repeat="t in topics">
         <!-- this should be a view or a directive? -->
         <span class="topic-header" ng-class="{edit: t.mode.edit}">
           <span class="topic-name">{{t.name}}</span>
           <input ng-show="t.mode.edit" type="text" ng-model="t.name">
-          <span class="icon topic-edit icon-wrench active" ng-class="{selected: t.mode.edit}" title="edit topic" ng-click="swapTopicMode('edit', t)"></span>
           <span ng-show="t.mode.edit" class="topic-toolbox">
             <span class="icon icon-plus" ng-class="{active: t.mode.edit, selected: t.mode.addWord}" title="add word(s) to the topic" ng-click="swapTopicMode('add', t)"></span>
-            <span class="icon icon-scissors" ng-class="{active: t.mode.removeWord}" title="remove word(s) from the topic" ng-click="removeWords(t.id)"></span>
-            <span class="icon icon-trash" ng-class="{active: t.mode.trashWord}" title="add word(s) to the global stop words list" ng-click="addToStopWords(t.id)"></span>
+            <span class="icon icon-scissors" ng-class="{active: t.mode.removeWord}" title="remove word(s) from the topic" ng-click="removeWords(t)"></span>
+            <span class="icon icon-trash" ng-class="{active: t.mode.trashWord}" title="add word(s) to the global stop words list" ng-click="addToStopWords(t)"></span>
           </span>
+          <span class="icon topic-edit icon-wrench active" ng-class="{selected: t.mode.edit}" title="edit topic" ng-click="swapTopicMode('edit', t)"></span>
+
         </span>
         <!-- this should be a directive -->
         <topic-graph topic="t"></topic-graph>
         <span ng-show="t.mode.addWord" class="topic-footer">
-          <input ng-show="t.mode.addWord" type="text" ng-model="t.addedWord" ng-enter="addWord(t)" >
+          <input class="topic-word-input" ng-show="t.mode.addWord" type="text" ng-model="t.addedWord" ng-enter="addWord(t)" >
         </span>
       </span>
     </div>

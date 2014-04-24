@@ -26,6 +26,10 @@ angular.module('termite.services', [])
 				});
 		};
 
+		TopicModelService.continueITM = function () {
+
+		};
+
 		return TopicModelService;
 
 	});

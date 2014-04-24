@@ -11,7 +11,15 @@ termite.controller("DataManager", function($scope, TopicModelService) {
   $scope.termLimits = [ 5, 7, 10, 15, 20 ] ;
   $scope.termLimit = $scope.termLmits[2];
 
+  $scope.$on("topic-model-loaded") = function () {
+    $("#loader").hide();
+  }
+
   $scope.refresh = function () {
+    // show the loader
+    $("#loader").show();
+
+    // get the requested topic model
     TopicModelService.getTopicModel($scope.topicModel, $scope.termLimit);
   };
 

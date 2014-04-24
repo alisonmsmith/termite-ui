@@ -1,22 +1,7 @@
 $body-text: 'Lato', Helvetica, Arial, sans-serif;
 
-
-// Colors courtesty of Flat UI
-$silver: #BDC3C7;
-$clouds: #ECF0F1;
-$concrete: #95A5A6;
-$asbestos: #7F8C8D;
-$turquoise: #1ABC9C;
-$greensea: #16A085;
-$emerald: #2ECC71;
-$wetasphalt: #34495E;
-$belizehole: #2980B9;
-$peterriver: #3498DB;
-$amethyst: #9B59B6;
-$wisteria: #8E44AD;
-$carrot: #E67E22;
-$pumpkin: #D35400;
-$alizarin: #E74C3C;
+@import "variables/colors";
+@import "common/loader";
 
 // Transition property compatible in all
 // supporting browsers. 
@@ -59,6 +44,7 @@ body {
 }
 
 .header {
+	float: right;
 	font: {
 		weight: 300;
 		size: 2em;
@@ -85,14 +71,26 @@ body {
 	}
 	&.selected {
 		.circle {
-			stroke: $turquoise;
+			stroke: $peterriver;
 			stroke-width: 4px;
 		}
 	}
 	&.hovered {
 		.circle {
-			fill: $turquoise;
+			fill: $peterriver;
 		}
+	}
+}
+
+#itm-continue-button {
+	width: 100%;
+	text-align: center;
+	font-size: 24pt;
+	font-weight: 300;
+	color: $asbestos;
+	cursor: pointer;
+		&:hover {
+		color:$silver;
 	}
 }
 
@@ -205,7 +203,7 @@ $topicheight: 225px;
 }
 
 	.icon {
-		padding: 5px;
+		padding: 3px;
 		
 		&.active {
 			cursor: pointer;
@@ -223,45 +221,25 @@ $topicheight: 225px;
 
 	}
 
-.topic-edit, .topic-toolbox {
+.topic-edit {
 	float: right;
-	display: none;
 }
 
-.topic-toolbox {
-	padding-top: 5px;
+.topic-edit, .topic-toolbox {
+	display: none;
 }
 
 .topic-footer {
 	display:inline-block;
 	position: relative; 
-	top: -33px;
+	top: -25px;
 	background-color: $asbestos;
 	opacity: 0.7;
 	width: $topicwidth - 2;
-	&.add {
-		padding: 4px;
-		.topic-word-input {
-			display: inline;
-		}
-		.topic-edit-complete{
-			display: inline;
-		}
-	}
-	&.edit {
-		padding: 4px;
-		.topic-edit-instructions {
-			display: inline;
-		}
-		.topic-edit-complete {
-			display: inline;
-		}
-	}
 }
 
 .topic-edit-complete {
 	float: right;
-	display: none;
 }
 
 input {
@@ -270,7 +248,6 @@ input {
 }
 
 .topic-edit-instructions {
-	display: none;
 	background-color: $asbestos;
 	color: $clouds;
 }
@@ -279,7 +256,7 @@ input {
 	@include universal-placeholder-color($silver);
 	background-color: $asbestos;
 	color: $clouds;
-	display: none;
+	padding: 2px;
 //	position: relative;
 }
 

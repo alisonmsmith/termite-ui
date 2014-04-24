@@ -1,3 +1,47 @@
+@keyframes load {
+  0% {
+    color: #ecf0f1; }
+
+  25% {
+    color: #bdc3c7; }
+
+  50% {
+    color: #7f8c8d; }
+
+  75% {
+    color: #bdc3c7; }
+
+  100% {
+    color: #ecf0f1; } }
+@-webkit-keyframes load {
+  0% {
+    color: #ecf0f1; }
+
+  25% {
+    color: #bdc3c7; }
+
+  50% {
+    color: #7f8c8d; }
+
+  75% {
+    color: #bdc3c7; }
+
+  100% {
+    color: #ecf0f1; } }
+.ui-loader {
+  animation: load 2s infinite ease-out;
+  -webkit-animation: load 2s infinite ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  padding: 200px;
+  width: 100%;
+  height: 100%;
+  font-size: 48px;
+  font-weight: 300;
+  background-color: rgba(0, 0, 0, 0.7); }
+
 * {
   box-sizing: border-box; }
 
@@ -7,6 +51,7 @@ body {
   color: #1abc9c; }
 
 .header {
+  float: right;
   font-weight: 300;
   font-size: 2em;
   margin-left: 10px; }
@@ -24,10 +69,20 @@ body {
   .node.new .circle {
     fill: #8e44ad; }
   .node.selected .circle {
-    stroke: #1abc9c;
+    stroke: #3498db;
     stroke-width: 4px; }
   .node.hovered .circle {
-    fill: #1abc9c; }
+    fill: #3498db; }
+
+#itm-continue-button {
+  width: 100%;
+  text-align: center;
+  font-size: 24pt;
+  font-weight: 300;
+  color: #7f8c8d;
+  cursor: pointer; }
+  #itm-continue-button:hover {
+    color: #bdc3c7; }
 
 #refresh-model {
   display: inline-block;
@@ -102,7 +157,7 @@ body {
       display: none; }
 
 .icon {
-  padding: 5px; }
+  padding: 3px; }
   .icon.active {
     cursor: pointer;
     color: #ecf0f1; }
@@ -113,50 +168,35 @@ body {
   .icon.inactive {
     color: #bdc3c7; }
 
-.topic-edit, .topic-toolbox {
-  float: right;
-  display: none; }
+.topic-edit {
+  float: right; }
 
-.topic-toolbox {
-  padding-top: 5px; }
+.topic-edit, .topic-toolbox {
+  display: none; }
 
 .topic-footer {
   display: inline-block;
   position: relative;
-  top: -33px;
+  top: -25px;
   background-color: #7f8c8d;
   opacity: 0.7;
   width: 223px; }
-  .topic-footer.add {
-    padding: 4px; }
-    .topic-footer.add .topic-word-input {
-      display: inline; }
-    .topic-footer.add .topic-edit-complete {
-      display: inline; }
-  .topic-footer.edit {
-    padding: 4px; }
-    .topic-footer.edit .topic-edit-instructions {
-      display: inline; }
-    .topic-footer.edit .topic-edit-complete {
-      display: inline; }
 
 .topic-edit-complete {
-  float: right;
-  display: none; }
+  float: right; }
 
 input {
   outline: 0;
   border: none; }
 
 .topic-edit-instructions {
-  display: none;
   background-color: #7f8c8d;
   color: #ecf0f1; }
 
 .topic-word-input {
   background-color: #7f8c8d;
   color: #ecf0f1;
-  display: none; }
+  padding: 2px; }
   .topic-word-input::-webkit-input-placeholder {
     /* WebKit browsers */
     color: #bdc3c7; }
