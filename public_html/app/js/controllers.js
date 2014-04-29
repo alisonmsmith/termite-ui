@@ -212,46 +212,56 @@ angular.module('termite.controllers', [])
 
 	  function processData() {
 	    var counter = 0;
-	    for (var topic in $scope.topicModel.TopTermsPerTopic) {
+	    for (var topic = 0; topic < $scope.topicModel.TopicCount; topic++) {
 	    	$scope.model[getTopicId(topic)] = {"existing":[], "removed":[], "added":[], "trashed":[]};
 	      var nodes = [];
 	      var edges = [];
 	      var connections = [];
 
 	      // Determine the graph connections (topic co-occurrence)
-	      $.each($scope.topicModel.TopicCooccurrence[topic], function (id, value) {
+	      $.each($scope.topicModel.TopicCovariance[topic], function (id, value) {
 	        if (value >= 2.0) {
 	          // add as a connection
 	          if (topic !== id) {
 	            connections.push({"id": getTopicId(id), "value": value});
 	          }
-	          
 	        }
 	      });
 
 	      // Determine the nodes (words of the topic)
-	      $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
-	        // TODO: I really don't like how this is being stored in the JSON... 
-	        for (var k in term) {
-	        	$scope.model[getTopicId(topic)].existing.push(k);
-	          nodes.push({"name":k, "value":term[k], "class":"existing"});
-	        }
-	      });
+		  nodes = $scope.topicModel.TopTermsPerTopic;
+		  $.each(nodes, function(topTerms) {
+			$.each(topTerms, function(d) {
+			  d.class = "existing";
+			});
+		  });
+		  /*
+	        $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
+	          // TODO: I really don't like how this is being stored in the JSON... 
+	          for (var k in term) {
+	          	$scope.model[getTopicId(topic)].existing.push(k);
+	            nodes.push({"name":k, "value":term[k], "class":"existing"});
+	          }
+	        });
+	      */
 	      // Determine the edges for each node
-	      // TODO: a better data structure may make this more efficient
-	      $.each(nodes, function (source, node) {
-	        if ($scope.topicModel.TermCoFreqs.hasOwnProperty(node.name)) {
-	          $.each($scope.topicModel.TermCoFreqs[node.name], function (term, value) {
-	            if (value > 500 && term !== node.name) {
-	              $.each(nodes, function (target, node2) {
-	                if (term === node2.name) {
-	                  edges.push({"source":node, "target":node2, "value":value});
-	                }
-	              });
-	            }
-	          });
-	        }
-	      })
+	      edges = $scope.topicModel.TermPMI;
+	      /*
+	        // TODO: a better data structure may make this more efficient
+	        $.each(nodes, function (source, node) {
+	          if ($scope.topicModel.TermCoFreqs.hasOwnProperty(node.name)) {
+	            $.each($scope.topicModel.TermCoFreqs[node.name], function (term, value) {
+	              if (value > 500 && term !== node.name) {
+	                $.each(nodes, function (target, node2) {
+	                  if (term === node2.name) {
+	                    edges.push({"source":node, "target":node2, "value":value});
+	                  }
+	                });
+	              }
+	            });
+	          }
+	        });
+	      */
 	      var m = {"edit":false, "addWord":false, "removeWord":true, "trashWord":true};
 	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), 
 	      	"mode":m, "name":"TOPIC " + topic, "connections":connections, "selectedWords":[]});
