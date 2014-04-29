@@ -218,7 +218,10 @@ angular.module('termite.controllers', [])
 	      var edges = [];
 	      var connections = [];
 
-	      // Determine the graph connections (topic co-occurrence)
+	      // Determine the graph connections (topic covariance)
+	      // Expected data structure for 'TopicCovariance' is a list of tuples where
+	      // each tuple contains four fields: source, target, value, rank
+	      // The list is sorted by ascending rank (equivalent to descending value).
 	      $.each($scope.topicModel.TopicCovariance[topic], function (id, value) {
 	        if (value >= 2.0) {
 	          // add as a connection
@@ -229,6 +232,9 @@ angular.module('termite.controllers', [])
 	      });
 
 	      // Determine the nodes (words of the topic)
+	      // Expected data structure for 'TopTermsPerTopic' is a list of list of tuples where
+	      // each tuple contains four fields: term, value
+	      // Each of the sublist is sorted by descending value
 		  nodes = $scope.topicModel.TopTermsPerTopic;
 		  $.each(nodes, function(topTerms) {
 			$.each(topTerms, function(d) {
@@ -245,6 +251,9 @@ angular.module('termite.controllers', [])
 	        });
 	      */
 	      // Determine the edges for each node
+	      // Expected data structure for 'TermPMI' is a list of tuples where
+	      // each tuple contains four fields: source, target, value, rank
+	      // The list is sorted by ascending rank (equivalent to descending value).
 	      edges = $scope.topicModel.TermPMI;
 	      /*
 	        // TODO: a better data structure may make this more efficient
