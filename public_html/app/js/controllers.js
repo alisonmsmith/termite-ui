@@ -205,20 +205,23 @@ angular.module('termite.controllers', [])
 	        });
 	      */
 	      // Determine the edges for each node
-	      // TODO: a better data structure may make this more efficient
-	      $.each(nodes, function (source, node) {
-	        if ($scope.topicModel.TermCoFreqs.hasOwnProperty(node.name)) {
-	          $.each($scope.topicModel.TermCoFreqs[node.name], function (term, value) {
-	            if (value > 500 && term !== node.name) {
-	              $.each(nodes, function (target, node2) {
-	                if (term === node2.name) {
-	                  edges.push({"source":node, "target":node2, "value":value});
-	                }
-	              });
-	            }
-	          });
-	        }
-	      })
+	      edges = $scope.topicModel.TermPMI;
+	      /*
+	        // TODO: a better data structure may make this more efficient
+	        $.each(nodes, function (source, node) {
+	          if ($scope.topicModel.TermCoFreqs.hasOwnProperty(node.name)) {
+	            $.each($scope.topicModel.TermCoFreqs[node.name], function (term, value) {
+	              if (value > 500 && term !== node.name) {
+	                $.each(nodes, function (target, node2) {
+	                  if (term === node2.name) {
+	                    edges.push({"source":node, "target":node2, "value":value});
+	                  }
+	                });
+	              }
+	            });
+	          }
+	        });
+	      */
 	      var m = {"edit":false, "addWord":false, "removeWord":true, "trashWord":true};
 	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), 
 	      	"mode":m, "name":"TOPIC " + topic, "connections":connections, "selectedWords":[]});
