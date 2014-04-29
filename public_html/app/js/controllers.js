@@ -189,13 +189,21 @@ angular.module('termite.controllers', [])
 	      });
 
 	      // Determine the nodes (words of the topic)
-	      $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
-	        // TODO: I really don't like how this is being stored in the JSON... 
-	        for (var k in term) {
-	        	$scope.model[getTopicId(topic)].existing.push(k);
-	          nodes.push({"name":k, "value":term[k], "class":"existing"});
-	        }
-	      });
+		  nodes = $scope.topicModel.TopTermsPerTopic;
+		  $.each(nodes, function(topTerms) {
+			$.each(topTerms, function(d) {
+			  d.class = "existing";
+			});
+		  });
+		  /*
+	        $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
+	          // TODO: I really don't like how this is being stored in the JSON... 
+	          for (var k in term) {
+	          	$scope.model[getTopicId(topic)].existing.push(k);
+	            nodes.push({"name":k, "value":term[k], "class":"existing"});
+	          }
+	        });
+	      */
 	      // Determine the edges for each node
 	      // TODO: a better data structure may make this more efficient
 	      $.each(nodes, function (source, node) {
