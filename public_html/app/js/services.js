@@ -13,8 +13,8 @@ angular.module('termite.services', [])
 		TopicModelService.topicModelId = null;
 
 		TopicModelService.getTopicModel = function (id, terms) {
-			var url = "http://termite.jcchuang.org/" + id + "/vis/GroupInABox?origin=http://127.0.0.1:8000&format=json&termLimit=" + terms;
-			console.log("[LOADING]", "URL", url);
+			var url = "http://treetm.jcchuang.org/" + id + "/itm/gib?origin=http://127.0.0.1:8000&format=json&termLimit=" + terms;
+			console.log("[LOADING]", "URL", url);  // OPTIONAL: This can be either a POST or a GET request. The web server handles the two in the same way. POST might be slightly preferred as we're not technically properly escaping the querystring "http://127.0.0.1:8000" in this GET request.
 
 			$http.get(url).
 				success(function (data, status, headers, config) {
@@ -30,16 +30,18 @@ angular.module('termite.services', [])
 
 		TopicModelService.continueITM = function (id, data) {
 			$http({
-				url:"http://termite.jcchuang.org/" + TopicModelService.topicModelId + "/itm/update",
+				url:"http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib",
 				method: "POST",
 				dataType: "json",
 				data: {
 					"iters": 1000,
+					"action": "train",
 					"mustLinks": data.must,
 					"cannotLinks": data.cannot,
 					"keepTerms": data.keep,
 					"removeTerms": data.remove,
-					"origin":"http://127.0.0.1:8000"
+					"origin": "http://127.0.0.1:8000",
+					"termLimit": 10  // TODO: insert the number of terms to return, mirroring the getTopcModel URL call above
 				}
 			}).success(function (data, status, headers, config) {
 				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
