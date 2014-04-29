@@ -37,7 +37,11 @@ angular.module('termite.controllers', [])
   */
   .controller('TopicModelViewController', ['$rootScope', '$scope', 'TopicModelService', function($rootScope, $scope, TopicModelService) {
 	  $scope.topics = [];
+
+	  // data structure for storing changes to the model
+	  // for each topic we store (existing, added, and removed words)
 	  $scope.model = {};
+
 	//  $scope.layout = twentytopiclayout;
 	  $scope.topicModel = null;
 
@@ -56,10 +60,44 @@ angular.module('termite.controllers', [])
 	  	//$scope.setTopicMode("remove", topic, true);
 	  });
 
+	  function constructITMParams () {
+	  	// list of lists of words
+	  	var mustLinks=[],
+	  		// list of lists (likely tuples) of words
+	  		cannotLinks=[],
+	  		// dictionary of topic to list of words
+	  		keepTerms = {},
+	  		// list of words
+	  		removeTerms = [];
+
+	  	angular.forEach($scope.model, function (id, topic) {
+	  		// any trash words add to 'remove terms'
+	  		removeTerms = _.union(removeTerms, topic.trashed);
+
+	  		// for now we will assume that added + existing words have a must link relationship
+	  		mustLinks.push(_.union(topic.existing, topic.added));
+
+	  		// for now we will also assume that a removed word has a cannot link with any existing words
+	  		angular.forEach(topic.removed, function (i, r) {
+	  			angular.forEach(topic.existing, function (i, e) {
+	  				cannotLinks.push([r,e]);
+	  			});
+	  		});
+
+	  		// for now we will assume that any added words and existing words should be kept with the topic
+	  		keepTerms[id] = _.union(topic.existing, topic.added);
+	  	});
+
+	  	return {"must":mustLinks, "cannot":cannotLinks, "keep":keepTerms, "remove":removeTerms};
+	  }
+
 	  $scope.continue = function () {
 	  	console.log("continue processing");
+	  	// prepare the data required to continue
+	  	var data = constructITMParams();
+
 	  	// continue on to the next iteration
-	  	TopicModelService.continueITM();
+	  	TopicModelService.continueITM(data);
 	  };
 
 	  $scope.addToStopWords = function (t) {
@@ -159,6 +197,9 @@ angular.module('termite.controllers', [])
 
 	  	if (type === "edit") {
 	  		topic.mode.edit = !topic.mode.edit;
+	  		if (!topic.mode.edit) {
+	  			topic.mode.addWord = false;
+	  		}
 	  	} else if (type === "add") {
 	  		topic.mode.addWord = !topic.mode.addWord;
 	  	}

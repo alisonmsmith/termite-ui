@@ -32,7 +32,7 @@
         <!-- this should be a view or a directive? -->
         <span class="topic-header" ng-class="{edit: t.mode.edit}">
           <span class="topic-name">{{t.name}}</span>
-          <input ng-show="t.mode.edit" type="text" ng-model="t.name">
+          <input ng-show="t.mode.edit" type="text" ng-model="t.name" ng-enter="edit = false;">
           <span ng-show="t.mode.edit" class="topic-toolbox">
             <span class="icon icon-plus" ng-class="{active: t.mode.edit, selected: t.mode.addWord}" title="add word(s) to the topic" ng-click="swapTopicMode('add', t)"></span>
             <span class="icon icon-scissors" ng-class="{active: t.mode.removeWord}" title="remove word(s) from the topic" ng-click="removeWords(t)"></span>
