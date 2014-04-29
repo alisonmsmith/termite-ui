@@ -171,20 +171,19 @@ angular.module('termite.controllers', [])
 
 	  function processData() {
 	    var counter = 0;
-	    for (var topic in $scope.topicModel.TopTermsPerTopic) {
+	    for (var topic = 0; topic < $scope.topicModel.TopicCount; topic++) {
 	    	$scope.model[getTopicId(topic)] = {"existing":[], "removed":[], "added":[], "trashed":[]};
 	      var nodes = [];
 	      var edges = [];
 	      var connections = [];
 
 	      // Determine the graph connections (topic co-occurrence)
-	      $.each($scope.topicModel.TopicCooccurrence[topic], function (id, value) {
+	      $.each($scope.topicModel.TopicCovariance[topic], function (id, value) {
 	        if (value >= 2.0) {
 	          // add as a connection
 	          if (topic !== id) {
 	            connections.push({"id": getTopicId(id), "value": value});
 	          }
-	          
 	        }
 	      });
 
