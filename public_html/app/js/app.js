@@ -4,7 +4,6 @@
 // Declare app level module which depends on filters, and services
 angular.module('termite', [
   'ngRoute',
-  'termite.filters',
   'termite.services',
   'termite.directives',
   'termite.controllers'

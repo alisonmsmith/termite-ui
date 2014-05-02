@@ -8,25 +8,28 @@ angular.module('termite.controllers', [])
   */
   .controller('DatasetController', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
 	  $scope.topicModels = [
-	      "nsf1k_mallet",
-	      "nsf10k_mallet",
-	      "nsf25k_mallet",
-	      "nsf146k_mallet",
-	      "20newsgroups_mallet"
+	      "nsf1k_treetm",
+	      "nsf10k_treetm",
+	      "nsf25k_treetm",
+	      "nsf146k_treetm",
+	      "20newsgroups_treetm"
 	    ];
 	  $scope.topicModel = $scope.topicModels[0];
 
 	  $scope.termLimits = [ 5, 7, 10, 15, 20 ];
 	  $scope.termLimit = $scope.termLimits[2];
 
+	  $scope.loading = false;
+
 	  $scope.$on("topic-model-loaded", function () {
-    	$("#loader").hide();
+    	$scope.loading = false;
+	  });
+
+	  $scope.$on("topic-model-loading", function () {
+	  	$scope.loading = true;
 	  });
 
 	  $scope.refresh = function () {
-	  	// show the loader
-    	$("#loader").show();
-
 	    TopicModelService.getTopicModel($scope.topicModel, $scope.termLimit);
 	  };
 
@@ -37,6 +40,7 @@ angular.module('termite.controllers', [])
   */
   .controller('TopicModelViewController', ['$rootScope', '$scope', 'TopicModelService', function($rootScope, $scope, TopicModelService) {
 	  $scope.topics = [];
+	  $scope.topicEdges = [];
 
 	  // data structure for storing changes to the model
 	  // for each topic we store (existing, added, and removed words)
@@ -108,15 +112,15 @@ angular.module('termite.controllers', [])
 	  	angular.forEach(t.selectedWords, function (selected) {
 	  		// remove the word from the  nodes list and therefore the visualization
 	  		angular.forEach(t.nodes, function (node, index) {
-	  			if (node.name === selected.name) {
+	  			if (node.term === selected.term) {
 	  				//node.class = "trash";
 	  				toRemove.push(node);
 
 	  				// add the word to the trashed list
-	  				$scope.model[t.id].trashed.push(node.name);
+	  				$scope.model[t.id].trashed.push(node.term);
 
 	  				// remove the word from the existing list
-	  				var index = $scope.model[t.id].existing.indexOf(node.name);
+	  				var index = $scope.model[t.id].existing.indexOf(node.term);
 	  				if (index !== -1) {
 	  					$scope.model[t.id].existing.splice(index, 1);
 	  				}
@@ -143,12 +147,12 @@ angular.module('termite.controllers', [])
 	  	angular.forEach(t.selectedWords, function (selected) {
 	  		// remove the word from the  nodes list or color the word 'to be removed'
 	  		angular.forEach(t.nodes, function (node) {
-	  			if (node.name === selected.name) {
+	  			if (node.term === selected.term) {
 	  				//node.class = "remove";
 	  				toRemove.push(node);
-	  				$scope.model[t.id].removed.push(node.name);
+	  				$scope.model[t.id].removed.push(node.term);
 
-	  				var index = $scope.model[t.id].existing.indexOf(node.name);
+	  				var index = $scope.model[t.id].existing.indexOf(node.term);
 	  				if (index !== -1) {
 	  					$scope.model[t.id].existing.splice(index, 1);
 	  				}
@@ -174,7 +178,7 @@ angular.module('termite.controllers', [])
 
 	 $scope.addWord = function (t) {
 	 	console.log("added " + t.addedWord + " to topic " + t.id);
-	  	t.nodes.push({"name":t.addedWord, "value":100, "class":"new"}); 
+	  	t.nodes.push({"term":t.addedWord, "value":.01, "class":"new"}); 
 	  	$scope.model[t.id].added.push(t.addedWord);
 	  //	$rootScope.$broadcast("addWord", {"word":t.addedWord, "topic":t.id} );
 	  	$scope.$broadcast(t.id + ":update");
@@ -211,35 +215,48 @@ angular.module('termite.controllers', [])
 	  }
 
 	  function processData() {
-	    var counter = 0;
+	  	var thresh = 0.1;
+
+	    // Take the top x% (based on thresh) topic edges
+	    $scope.topicEdges = $scope.topicModel.TopicCovariance.splice(0,($scope.topicModel.TopicCovariance.length*thresh));
+
 	    for (var topic = 0; topic < $scope.topicModel.TopicCount; topic++) {
+	    	// Initialize the topic in the model 
 	    	$scope.model[getTopicId(topic)] = {"existing":[], "removed":[], "added":[], "trashed":[]};
-	      var nodes = [];
-	      var edges = [];
-	      var connections = [];
+	      	
+	      	var nodes = [],
+	      	 	edges = [],
+	      	 	connections = [];
+
+	      	// Determine the connected topics (based on topic covariance)
+	      	angular.forEach($scope.topicEdges, function (edge) {
+	      		if (edge.source === topic) {
+	      			connections.push(edge);
+	      		}
+	      	});
 
 	      // Determine the graph connections (topic covariance)
 	      // Expected data structure for 'TopicCovariance' is a list of tuples where
 	      // each tuple contains four fields: source, target, value, rank
 	      // The list is sorted by ascending rank (equivalent to descending value).
-	      $.each($scope.topicModel.TopicCovariance[topic], function (id, value) {
+	     /* $.each($scope.topicModel.TopicCovariance[topic], function (id, value) {
 	        if (value >= 2.0) {
 	          // add as a connection
 	          if (topic !== id) {
-	            connections.push({"id": getTopicId(id), "value": value});
+	           // connections.push({"id": getTopicId(id), "value": value});
 	          }
 	        }
-	      });
+	      }); */
+
+
 
 	      // Determine the nodes (words of the topic)
 	      // Expected data structure for 'TopTermsPerTopic' is a list of list of tuples where
 	      // each tuple contains four fields: term, value
 	      // Each of the sublist is sorted by descending value
-		  nodes = $scope.topicModel.TopTermsPerTopic;
-		  $.each(nodes, function(topTerms) {
-			$.each(topTerms, function(d) {
-			  d.class = "existing";
-			});
+		  nodes = $scope.topicModel.TopTermsPerTopic[topic];
+		  angular.forEach(nodes, function(node) {
+		  	node.class = "existing";
 		  });
 		  /*
 	        $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {
@@ -250,11 +267,33 @@ angular.module('termite.controllers', [])
 	          }
 	        });
 	      */
+
 	      // Determine the edges for each node
 	      // Expected data structure for 'TermPMI' is a list of tuples where
 	      // each tuple contains four fields: source, target, value, rank
 	      // The list is sorted by ascending rank (equivalent to descending value).
-	      edges = $scope.topicModel.TermPMI;
+	    //  edges = $scope.topicModel.TermPMI.splice(0,($scope.topicModel.TermPMI.length*thresh));
+	    edges = $scope.topicModel.TermPMI;
+	      var tmp = [];
+	   //   angular.forEach(nodes, function (node) {
+	      	angular.forEach(edges, function (edge) {
+	      		var sourceMatch = false,
+	      			targetMatch = false;
+	      		angular.forEach(nodes, function (node) {
+	      			if (node.term === edge.source) {
+	      				sourceMatch = true;
+	      			}
+	      			if (node.term === edge.target) {
+	      				targetMatch = true;
+	      			}
+
+	      		});
+	      		if (sourceMatch && targetMatch) {
+	      			tmp.push(edge);
+	      		}
+	      	});
+	     // });
+	      edges = tmp;
 	      /*
 	        // TODO: a better data structure may make this more efficient
 	        $.each(nodes, function (source, node) {
@@ -272,8 +311,8 @@ angular.module('termite.controllers', [])
 	        });
 	      */
 	      var m = {"edit":false, "addWord":false, "removeWord":true, "trashWord":true};
-	      $scope.topics.push({"nodes":nodes, "edges":edges, "id": getTopicId(topic), 
-	      	"mode":m, "name":"TOPIC " + topic, "connections":connections, "selectedWords":[]});
+	      $scope.topics.push({"nodes":nodes, "edges":edges, "connections":connections, "id": getTopicId(topic), 
+	      	"mode":m, "name":"TOPIC " + topic, "selectedWords":[]});
 	    	
 	      // initialize the mode for each topic view to default
 	    

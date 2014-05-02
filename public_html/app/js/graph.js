@@ -1,5 +1,5 @@
 function graph (topic) {
-    var $el = $("#" + topic.id);
+    var $el = angular.element("#" + topic.id);
 
     // Add and remove elements on the graph object
     this.addNode = function (node) {
@@ -44,14 +44,14 @@ function graph (topic) {
 
         d3.select("#" + topic.id).on("mouseover", function () {
         // highlight self and all connected topics
-        $(this).addClass("topic-hovered");
-        $.each(topic.connections, function (index, t) {
-            $("#"+t.id).addClass("topic-hovered");
+        angular.element(this).addClass("topic-hovered");
+        angular.forEach(topic.connections, function (t) {
+            angular.element("#"+t.id).addClass("topic-hovered");
         });
     }).on("mouseout", function () {
-        $(this).removeClass("topic-hovered");
-        $.each(topic.connections, function (index, t) {
-            $("#"+t.id).removeClass("topic-hovered");
+        angular.element(this).removeClass("topic-hovered");
+        angular.forEach.each(topic.connections, function (t) {
+            angular.element("#"+t.id).removeClass("topic-hovered");
         });
     })
 

@@ -9,7 +9,7 @@
     "angular-route": "1.2.x",
     "angular-loader": "1.2.x",
     "angular-mocks": "~1.2.15",
-    "jquery":"",
-    "d3":""
+    "underscore": "",
+    "d3": ""
   }
 }

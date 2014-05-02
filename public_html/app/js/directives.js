@@ -6,7 +6,7 @@
 angular.module('termite.directives', [])
 	.directive('ngEnter', function () {
     return function (scope, element, attrs) {
-        element.bind("keydown keypress", function (event) {
+        element.bind("keypress", function (event) {
             if(event.which === 13) {
                 scope.$apply(function (){
                     scope.$eval(attrs.ngEnter);
@@ -44,14 +44,14 @@ angular.module('termite.directives', [])
 
 	  		d3.select(elm[0]).on("mouseover", function () {
 	  			// highlight self and all connected topics
-				$(this).addClass("topic-hovered");
-        		$.each(topic.connections, function (index, t) {
-            		$("#"+t.id).addClass("topic-hovered");
+				angular.element(this).addClass("topic-hovered");
+        		angular.forEach(topic.connections, function (t) {
+            		angular.element(document.querySelector("#"+t.id)).addClass("topic-hovered");
         		});
 	  		}).on("mouseout", function () {
-        		$(this).removeClass("topic-hovered");
-        		$.each(topic.connections, function (index, t) {
-            		("#"+t.id).removeClass("topic-hovered");
+        		angular.element(this).removeClass("topic-hovered");
+        		angular.forEach(topic.connections, function (t) {
+            		angular.element(document.querySelector("#"+t.id)).removeClass("topic-hovered");
         		});
 	  		});
 
@@ -114,7 +114,7 @@ angular.module('termite.directives', [])
 	    		link = link 
 			     //   .data(topic.edges);
 			     .data(force.links(), function (d) {
-			     	return d.source.name + "-" + d.target.name;
+			     	return d.source + "-" + d.target;
 			     });
 
 
@@ -126,14 +126,14 @@ angular.module('termite.directives', [])
 			   	node = node
 	          		//.data(topic.nodes);
 	          		.data(force.nodes(), function (d) {
-	          			return d.name;
+	          			return d.term;
 	          		});
 
 	          	var nodeEnter = node.enter().append("g")
-	          		.attr("class", function(d) { return "node node__"+d.name + " " + d.class })
+	          		.attr("class", function(d) { return "node node__"+d.term + " " + d.class })
 	      			// Highlight all matching term nodes
-	      			.on( "mouseover", function(d) { d3.selectAll("g.node__"+d.name).classed({"hovered":true}); })//.style("fill", "#2ECC71").style("stroke", "#2ECC71") })
-	      			.on( "mouseout", function(d) { d3.selectAll("g.node__"+d.name).classed({"hovered":false}); })//.style("fill", null).style("stroke", null) })
+	      			.on( "mouseover", function(d) { d3.selectAll("g.node__"+d.term).classed({"hovered":true}); })//.style("fill", "#2ECC71").style("stroke", "#2ECC71") })
+	      			.on( "mouseout", function(d) { d3.selectAll("g.node__"+d.term).classed({"hovered":false}); })//.style("fill", null).style("stroke", null) })
 	      			// Toggle Select
 	      			.on( "click", function (d) { 
 	      				// if the node is already selected, unselect it 
@@ -156,17 +156,17 @@ angular.module('termite.directives', [])
 
 	          	var circle = nodeEnter.append("circle")
 		        	.attr("class", "circle")
-		      	  	.attr("r", function (d) { return Math.min(d.value/10, 40) + "px"; })
+		      	  	.attr("r", function (d) { return Math.min(d.value*2000, 40) + "px"; })
 		        	.call(nodedrag);
 
 		    	var label = nodeEnter.append("text")
 		        	.attr("class", "term")
-		        	.text(function(d) { return d.name})
+		        	.text(function(d) { return d.term})
 		        	.attr("text-anchor", "middle")
 		        	.call(nodedrag);
 
 		    	nodeEnter.append("title")
-		        	.text(function(d) { return d.name; });
+		        	.text(function(d) { return d.term; });
 
 		        var n = 100;
 		    	force.start();
