@@ -11,7 +11,7 @@ angular.module('termite.controllers', [])
 	      "nsf1k_treetm",
 	      "nsf10k_treetm",
 	      "nsf25k_treetm",
-	      "nsf146k_treetm",
+//	      "nsfgrants_treetm",     // Temporarily taken out until we have a MALLET -> ITM pipeline set up.
 	      "20newsgroups_treetm"
 	    ];
 	  $scope.topicModel = $scope.topicModels[0];
