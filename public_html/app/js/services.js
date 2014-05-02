@@ -30,7 +30,7 @@ angular.module('termite.services', [])
 		};
 
 		TopicModelService.continueITM = function (data) {
-			var url = "http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib?origin=http://127.0.0.1:8000"
+			var url = "http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib?origin=http://127.0.0.1:8000&format=json"
 			$rootScope.$broadcast("topic-model-loading");
 			$http({
 				url:url,
