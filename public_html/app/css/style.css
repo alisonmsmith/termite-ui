@@ -13,6 +13,7 @@
 
   100% {
     color: #ecf0f1; } }
+
 @-webkit-keyframes load {
   0% {
     color: #ecf0f1; }
@@ -28,6 +29,7 @@
 
   100% {
     color: #ecf0f1; } }
+
 .ui-loader {
   animation: load 2s infinite ease-out;
   -webkit-animation: load 2s infinite ease-out;

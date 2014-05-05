@@ -33,6 +33,8 @@ angular.module('termite.services', [])
 				});
 		};
 
+
+
 		TopicModelService.continueITM = function (data) {
 			$rootScope.$broadcast("topic-model-loading");
 			var data = {
@@ -57,6 +59,7 @@ angular.module('termite.services', [])
 				url : url,
 				data : $.param(data),
 				method : 'POST',
+
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 			})
 				.success(function (data, status, headers, config) {
