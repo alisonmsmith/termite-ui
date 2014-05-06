@@ -1,5 +1,9 @@
 #!/bin/bash
 
+update_dependencies() {
+	cd public_html && bower update && cd ..
+}
+
 launch_browser() {
 	OS=${OSTYPE//[0-9.]/}
 	if [ "$OS" == "darwin" ]
@@ -22,5 +26,6 @@ launch_localhost() {
 	cd public_html && python -m SimpleHTTPServer 8000
 }
 
+update_dependencies
 launch_browser &
 launch_localhost
