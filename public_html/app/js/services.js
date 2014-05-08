@@ -19,18 +19,23 @@ angular.module('termite.services', [])
 				"format": "json",
 				"termLimit" : terms
 			}
-			var url = "http://treetm.jcchuang.org/" + id + "/itm/gib?" + $.param(data);
-			console.log("[LOADING]", "URL", url);
-			$http.get(url).
-				success(function (data, status, headers, config) {
-					console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
-					TopicModelService.topicModel = data;
-					TopicModelService.topicModelId = id;
-					$rootScope.$broadcast('topic-model-loaded');
-				}).
-				error(function (data, status, headers, config) {
-					console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
-				});
+			var url = "http://treetm.jcchuang.org/" + id + "/itm/gib";
+			console.log("[LOADING]", "URL", url, "DATA", data);
+			$http({
+				url : url,
+				data : $.param(data),
+				method : 'POST',
+				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+			}).
+			success(function (data, status, headers, config) {
+				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
+				TopicModelService.topicModel = data;
+				TopicModelService.topicModelId = id;
+				$rootScope.$broadcast('topic-model-loaded');
+			}).
+			error(function (data, status, headers, config) {
+				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
+			});
 		};
 
 
@@ -48,27 +53,21 @@ angular.module('termite.services', [])
 					"keepTerms": data.keep,
 					"removeTerms": data.remove
 				};
-// GET Request 
-/*
-			var url = "http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib?" + $.param(data);
-			$http.get(url)
-*/
-// POST Request 
 			var url = "http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib"
+			console.log("[LOADING]", "URL", url, "DATA", data);
 			$http({
 				url : url,
 				data : $.param(data),
 				method : 'POST',
-
 				headers: {'Content-Type': 'application/x-www-form-urlencoded'}
 			})
-				.success(function (data, status, headers, config) {
-					console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
-					TopicModelService.topicModel = data;
-					$rootScope.$broadcast('topic-model-loaded');
-				}).error(function (data, status, headers, config) {
-					console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
-				});
+			.success(function (data, status, headers, config) {
+				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
+				TopicModelService.topicModel = data;
+				$rootScope.$broadcast('topic-model-loaded');
+			}).error(function (data, status, headers, config) {
+				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
+			});
 		};
 
 		return TopicModelService;
