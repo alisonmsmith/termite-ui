@@ -74,7 +74,7 @@ angular.module('termite.controllers', [])
 	  		// list of words
 	  		removeTerms = [];
 
-	  	angular.forEach($scope.model, function (id, topic) {
+	  	angular.forEach($scope.model, function (topic, id) {
 	  		// any trash words add to 'remove terms'
 	  		removeTerms = _.union(removeTerms, topic.trashed);
 
@@ -82,9 +82,9 @@ angular.module('termite.controllers', [])
 	  		mustLinks.push(_.union(topic.existing, topic.added));
 
 	  		// for now we will also assume that a removed word has a cannot link with any existing words
-	  		angular.forEach(topic.removed, function (i, r) {
-	  			angular.forEach(topic.existing, function (i, e) {
-	  				cannotLinks.push([r,e]);
+	  		angular.forEach(topic.removed, function (removed) {
+	  			angular.forEach(topic.existing, function (existing) {
+	  				cannotLinks.push([removed,existing]);
 	  			});
 	  		});
 
@@ -257,6 +257,7 @@ angular.module('termite.controllers', [])
 		  nodes = $scope.topicModel.TopTermsPerTopic[topic];
 		  angular.forEach(nodes, function(node) {
 		  	node.class = "existing";
+		  	$scope.model[getTopicId(topic)].existing.push(node.term);
 		  });
 		  /*
 	        $.each($scope.topicModel.TopTermsPerTopic[topic], function (index, term) {

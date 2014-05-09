@@ -1,0 +1,282 @@
+$body-text: 'Lato', Helvetica, Arial, sans-serif;
+
+@import "variables/colors";
+@import "common/loader";
+
+// Transition property compatible in all
+// supporting browsers. 
+@mixin universal-transition($time, $type: all) {
+	-webkit-transition: $type $time;
+	-moz-transition: $type $time;
+	-o-transition: $type $time;
+	transition: $type $time;
+}
+
+@mixin universal-placeholder-color($color) {
+	&::-webkit-input-placeholder { /* WebKit browsers */
+    	color: $color;
+	}
+	&:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    	color: $color;
+	}
+	&::-moz-placeholder { /* Mozilla Firefox 19+ */
+    	color: $color;
+	}
+	&:-ms-input-placeholder { /* Internet Explorer 10+ */
+    	color: $color;
+	}
+}
+
+@mixin universal-not-select() {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-size: 80%;
+	font-family: $body-text;
+	color: $turquoise;
+}
+
+.header {
+	float: right;
+	font: {
+		weight: 300;
+		size: 2em;
+	}
+	margin-left: 10px;
+	.light {
+		text-transform: lowercase;
+		font-size: 1em;
+	}
+}
+
+.circle {
+  fill: $silver;
+  opacity: 0.3;
+  stroke-width: 4px;
+}
+
+.node {
+	cursor: pointer;
+	&.new {
+		.circle {
+			fill: $wisteria;
+		}
+	}
+	&.selected {
+		.circle {
+			stroke: $peterriver;
+			stroke-width: 4px;
+		}
+	}
+	&.hovered {
+		.circle {
+			fill: $peterriver;
+		}
+	}
+}
+
+#itm-continue-button {
+	width: 100%;
+	text-align: center;
+	font-size: 24pt;
+	font-weight: 300;
+	color: $asbestos;
+	cursor: pointer;
+		&:hover {
+		color:$silver;
+	}
+}
+
+#refresh-model {
+	display: inline-block;
+	padding: 5px;
+	color: $turquoise;
+	border: solid 1px $turquoise;
+	cursor: pointer;
+
+		
+	&:hover {
+		color:$clouds;
+background-color:$turquoise;
+	}
+}
+
+.term {
+	@include universal-not-select();
+	fill: $wetasphalt;
+}
+
+.link {
+  stroke: $asbestos;
+  z-index:0;
+  stroke-opacity: .8;
+}
+
+#GIB {
+	float: left;
+	width:1250px;
+}
+
+$topicwidth: 225px;
+$topicnamewidth: 100px;
+$topicheight: 225px;
+.topic {
+	width: $topicwidth;
+	height: $topicheight;
+	float: left;
+	//position: absolute;
+	border: solid 1px $wetasphalt;
+	margin: 5px;
+}
+
+.topic-hovered {
+	//background-color:lighten($turquoise, 50%);
+	//border: solid 1px $turquoise;
+	.topic-header {
+		background-color: $turquoise;
+		&.edit {
+
+		}
+	}
+}
+
+.topic-header {
+	@include universal-transition(.25s, width);
+	position: absolute;
+	width: $topicnamewidth;
+	padding: 2px;
+	padding-left: 15px;
+	text-align: left;
+	background-color: $concrete;
+	color: $clouds;
+	opacity: 0.7;
+	.icon {
+		&.active {
+			&:hover {
+				background-color: $greensea;
+			}
+			&.selected {
+				background-color: $greensea;
+			}
+		}
+	}
+	&:hover {
+		width: $topicwidth - 2;
+		.topic-edit {
+			display: inline;
+		}
+	}
+
+	// EDIT MODE
+	&.edit {
+		padding: 2px;
+		border: solid 2px $belizehole;
+		background-color: $peterriver;
+		width: $topicwidth - 2;
+		.icon {
+			&.active {
+				&:hover {
+					background-color: $belizehole;
+				}
+				&.selected {
+					background-color: $belizehole;
+				}
+			}
+		}
+		.topic-toolbox, .topic-edit {
+			display: inline;
+		}
+		.topic-name-input {			
+			width: 100px;
+		}
+		.topic-name {
+			display: none;
+		}
+	}
+}
+
+	.icon {
+		padding: 3px;
+		
+		&.active {
+			cursor: pointer;
+			color: $clouds;
+			&:hover {
+				background-color: $silver;
+			}
+			&.selected {
+				background-color: $silver;
+			}
+		}
+		&.inactive {
+			color: $silver;
+		}
+
+	}
+
+.topic-edit {
+	float: right;
+}
+
+.topic-edit, .topic-toolbox {
+	display: none;
+}
+
+.topic-footer {
+	display:inline-block;
+	position: relative; 
+	top: -25px;
+	background-color: $asbestos;
+	opacity: 0.7;
+	width: $topicwidth - 2;
+}
+
+.topic-edit-complete {
+	float: right;
+}
+
+input {
+	outline: 0;
+	border: none;
+}
+
+.topic-edit-instructions {
+	background-color: $asbestos;
+	color: $clouds;
+}
+
+.topic-word-input {
+	@include universal-placeholder-color($silver);
+	background-color: $asbestos;
+	color: $clouds;
+	padding: 2px;
+//	position: relative;
+}
+
+/*.topic-cue {
+	position:absolute;
+	padding:5px;
+	width:10px;
+	color: $wetasphalt;
+	background-color:$wetasphalt;
+	opacity: 1.0;
+}*/
+
+.topic-name-input {
+	overflow:none;
+	width:0;
+	@include universal-placeholder-color($silver);
+//	position: relative;
+  	//padding: 4px 6px;
+  	color: $clouds;
+  	background-color: $peterriver;
+}
+
+

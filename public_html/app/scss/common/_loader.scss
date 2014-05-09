@@ -1,0 +1,54 @@
+// Loading image
+@keyframes load {
+	0% {
+		color:$clouds;
+	}
+	25% {
+		color:$silver;
+	}
+	50% {
+		color:$asbestos;
+	}
+	75% {
+		color:$silver;
+	}
+	100% {
+		color:$clouds;
+	}
+}
+
+@-webkit-keyframes load {
+	0% {
+		color:$clouds;
+	}
+	25% {
+		color:$silver;
+	}
+	50% {
+		color:$asbestos;
+	}
+	75% {
+		color:$silver;
+	}
+	100% {
+		color:$clouds;
+	}
+}
+
+.ui-loader {
+	animation: load 2s infinite ease-out;
+	-webkit-animation: load 2s infinite ease-out;
+
+
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	padding: 200px;
+	width: 100%;
+	height: 100%;
+	font-size: 48px;
+	font-weight: 300;
+	//background-color: rgba(0,0,0,0.4);
+	background-color: rgba(0, 0, 0, 0.7);
+}
