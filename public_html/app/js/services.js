@@ -7,7 +7,12 @@
 // In this case it is a simple value service.
 angular.module('termite.services', [])
 	.factory("TopicModelService", function ($http, $rootScope) {
+//		var ORIGIN = "http://homes.cs.washington.edu";
+		var ORIGIN = "http://127.0.0.1:8000";
+//		var SERVER = "http://localhost:8075";
+		var SERVER = "http://treetm.jcchuang.org";
 		var TopicModelService = {};
+		var iterCount = 1000;
 
 		TopicModelService.topicModelId = null;
 		TopicModelService.topicModel = null;
@@ -15,11 +20,11 @@ angular.module('termite.services', [])
 		TopicModelService.getTopicModel = function (id, terms) {
 			$rootScope.$broadcast("topic-model-loading");
 			var data = {
-				"origin": "http://127.0.0.1:8000",
+				"origin": ORIGIN,
 				"format": "json",
 				"termLimit" : terms
 			}
-			var url = "http://treetm.jcchuang.org/" + id + "/itm/gib";
+			var url = SERVER + "/" + id + "/itm/gib";
 			console.log("[LOADING]", "URL", url, "DATA", data);
 			$http({
 				url : url,
@@ -31,6 +36,7 @@ angular.module('termite.services', [])
 				console.log("[LOADED]", "URL", url, "Results:", status, "Data:", data);
 				TopicModelService.topicModel = data;
 				TopicModelService.topicModelId = id;
+				iterCount = data.IterCount;
 				$rootScope.$broadcast('topic-model-loaded');
 			}).
 			error(function (data, status, headers, config) {
@@ -42,18 +48,19 @@ angular.module('termite.services', [])
 
 		TopicModelService.continueITM = function (data) {
 			$rootScope.$broadcast("topic-model-loading");
+			iterCount += 10;
 			var data = {
-					"origin": "http://127.0.0.1:8000",
+					"origin": ORIGIN,
 					"format": "json",
 					"action":"train",
 					"termLimit": 10,
-					"iters": 1000,
-					"mustLinks": data.must,
-					"cannotLinks": data.cannot,
-					"keepTerms": data.keep,
-					"removeTerms": data.remove
+					"iters": iterCount,
+					"mustLinks": JSON.stringify(data.must),
+					"cannotLinks": JSON.stringify(data.cannot),
+					"keepTerms": JSON.stringify(data.keep),
+					"removeTerms": JSON.stringify(data.remove)
 				};
-			var url = "http://treetm.jcchuang.org/" + TopicModelService.topicModelId + "/itm/gib"
+			var url = SERVER + "/" + TopicModelService.topicModelId + "/itm/gib"
 			console.log("[LOADING]", "URL", url, "DATA", data);
 			$http({
 				url : url,
