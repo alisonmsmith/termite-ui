@@ -7,10 +7,11 @@
 // In this case it is a simple value service.
 angular.module('termite.services', [])
 	.factory("TopicModelService", function ($http, $rootScope) {
-//		var ORIGIN = "http://homes.cs.washington.edu";
-		var ORIGIN = "http://127.0.0.1:8000";
+		var ORIGIN = "http://homes.cs.washington.edu";
+//		var ORIGIN = "http://127.0.0.1:8000";
 //		var SERVER = "http://localhost:8075";
 		var SERVER = "http://treetm.jcchuang.org";
+		var ITER_INCREMENT = 5;
 		var TopicModelService = {};
 		var iterCount = 1000;
 
@@ -48,7 +49,7 @@ angular.module('termite.services', [])
 
 		TopicModelService.continueITM = function (data) {
 			$rootScope.$broadcast("topic-model-loading");
-			iterCount += 10;
+			iterCount += ITER_INCREMENT;
 			var data = {
 					"origin": ORIGIN,
 					"format": "json",
