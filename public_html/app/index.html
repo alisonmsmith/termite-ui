@@ -29,7 +29,7 @@
   <div id="GIB" ng-controller="TopicModelViewController">
     <div id="itm-continue-button" ng-click="continue()">continue</div>
     <div id="topics">
-      <span class="topic" id="{{t.id}}" ng-repeat="t in topics">
+      <span class="topic" id="{{t.id}}" ng-repeat="t in topics" ng-class="{hovered: t.hover}" ng-mouseenter="hover(t)" ng-mouseleave="unhover(t)">
         <!-- this should be a view or a directive? -->
         <span class="topic-header" ng-class="{edit: t.mode.edit}">
           <span class="topic-name">{{t.name}}</span>

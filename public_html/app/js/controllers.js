@@ -132,6 +132,13 @@ angular.module('termite.controllers', [])
 	  		if (index !== -1) {
 	  			t.nodes.splice(index, 1);
 	  		}
+	  		t.edges = t.edges.filter(function(edge) {
+	  			//return edge.source;
+	  			return (edge.sourceTerm !== node.term);
+	  		});
+	  		t.edges = t.edges.filter(function(edge) {
+	  			return (edge.targetTerm !== node.term);
+	  		});
 	  	});
 	  	t.selectedWords = [];
 	  	//$rootScope.$broadcast("trashWord", {"word":node.name, "topic":t.id} );
@@ -166,8 +173,12 @@ angular.module('termite.controllers', [])
 	  		if (index !== -1) {
 	  			t.nodes.splice(index, 1);
 	  		}
-	  		t.edges.filter(function(edge) {
-	  			return edge.source
+	  		t.edges = t.edges.filter(function(edge) {
+	  			//return edge.source;
+	  			return (edge.sourceTerm != node.term);
+	  		});
+	  		t.edges = t.edges.filter(function(edge) {
+	  			return (edge.targetTerm != node.term);
 	  		});
 	  	});
 	  	t.selectedWords = [];
@@ -210,6 +221,23 @@ angular.module('termite.controllers', [])
 
 	  }
 
+	  $scope.hover = function (topic) {
+	  	topic.hover = true;
+	  	angular.forEach($scope.topics, function (t) {
+	  		angular.forEach(topic.connections, function(connection) {
+	  			if (connection.target === t.id) {
+	  				t.hover = true;
+	  			}
+	  	});
+	  	});
+	  };
+
+	  $scope.unhover = function (topic) {
+	  	angular.forEach($scope.topics, function (topic) {
+	  		topic.hover = false;
+	  	});
+	  };
+
 	  function getTopicId(id) {
 	    return "topic" + id;
 	  }
@@ -220,6 +248,11 @@ angular.module('termite.controllers', [])
 	    // Take the top x% (based on thresh) topic edges
 	    $scope.topicEdges = $scope.topicModel.TopicCovariance.splice(0,($scope.topicModel.TopicCovariance.length*thresh));
 
+	    angular.forEach($scope.topicEdges, function(edge) {
+	    	edge.source = getTopicId(edge.source);
+	    	edge.target = getTopicId(edge.target);
+	    });
+
 	    for (var topic = 0; topic < $scope.topicModel.TopicCount; topic++) {
 	    	// Initialize the topic in the model 
 	    	$scope.model[getTopicId(topic)] = {"existing":[], "removed":[], "added":[], "trashed":[]};
@@ -228,9 +261,10 @@ angular.module('termite.controllers', [])
 	      	 	edges = [],
 	      	 	connections = [];
 
+
 	      	// Determine the connected topics (based on topic covariance)
 	      	angular.forEach($scope.topicEdges, function (edge) {
-	      		if (edge.source === topic) {
+	      		if (edge.source === getTopicId(topic)) {
 	      			connections.push(edge);
 	      		}
 	      	});
@@ -279,17 +313,25 @@ angular.module('termite.controllers', [])
 	   //   angular.forEach(nodes, function (node) {
 	      	angular.forEach(edges, function (edge) {
 	      		var sourceMatch = false,
-	      			targetMatch = false;
-	      		angular.forEach(nodes, function (node) {
+	      			targetMatch = false,
+	      			sourceIndex = -1,
+	      			targetIndex = -1;
+	      		angular.forEach(nodes, function (node, index) {
 	      			if (node.term === edge.source) {
+	      				sourceIndex = index;
 	      				sourceMatch = true;
 	      			}
 	      			if (node.term === edge.target) {
+	      				targetIndex = index;
 	      				targetMatch = true;
 	      			}
 
 	      		});
 	      		if (sourceMatch && targetMatch) {
+	      			edge.sourceTerm = edge.source;
+	      			edge.source = sourceIndex;
+	      			edge.targetTerm = edge.target;
+	      			edge.target = targetIndex;
 	      			tmp.push(edge);
 	      		}
 	      	});
@@ -313,7 +355,7 @@ angular.module('termite.controllers', [])
 	      */
 	      var m = {"edit":false, "addWord":false, "removeWord":true, "trashWord":true};
 	      $scope.topics.push({"nodes":nodes, "edges":edges, "connections":connections, "id": getTopicId(topic), 
-	      	"mode":m, "name":"TOPIC " + topic, "selectedWords":[]});
+	      	"mode":m, "name":"TOPIC " + topic, "selectedWords":[], "hover":false});
 	    	
 	      // initialize the mode for each topic view to default
 	    

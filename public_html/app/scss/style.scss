@@ -134,18 +134,17 @@ $topicheight: 225px;
 	//position: absolute;
 	border: solid 1px $wetasphalt;
 	margin: 5px;
-}
-
-.topic-hovered {
-	//background-color:lighten($turquoise, 50%);
-	//border: solid 1px $turquoise;
-	.topic-header {
+	&.hovered {
+			.topic-header {
 		background-color: $turquoise;
 		&.edit {
 
 		}
 	}
+	}
 }
+
+
 
 .topic-header {
 	@include universal-transition(.25s, width);

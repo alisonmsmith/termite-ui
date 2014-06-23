@@ -112,10 +112,10 @@ angular.module('termite.directives', [])
 			    }
 
 	    		link = link 
-			     //   .data(topic.edges);
-			     .data(force.links(), function (d) {
+			        .data(topic.edges);
+			   /*  .data(force.links());/*, function (d) {
 			     	return d.source + "-" + d.target;
-			     });
+			     });*/
 
 
 			    link.enter().append("line")
