@@ -4,7 +4,7 @@ termite.factory("TopicModelService", function () {
 	TopicModelService.topicModel = null;
 
 	TopicModelService.getTopicModel = function (id, terms) {
-		var url = "http://termite.jcchuang.org/" + id + "/vis/GroupInABox?origin=http://172.0.0.1:8000&format=json&termLimit=" + terms;
+		var url = "http://127.0.0.1:8075/" + id + "/vis/GroupInABox?origin=http://172.0.0.1:8000&format=json&termLimit=" + terms;
 		console.log("[LOADING]", "URL", url);
 
 		$http.get(url).

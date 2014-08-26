@@ -1,19 +1,29 @@
 'use strict';
 
-/* Services */
-
-
-// Demonstrate how to register services
-// In this case it is a simple value service.
 angular.module('termite.services', [])
-	.factory("TopicModelService", function ($http, $rootScope) {
-		var ORIGIN = "http://homes.cs.washington.edu";
-//		var ORIGIN = "http://127.0.0.1:8000";
-//		var SERVER = "http://localhost:8075";
-		var SERVER = "http://treetm.jcchuang.org";
-		var ITER_INCREMENT = 5;
+	.factory("GlobalService", function() {
+		return {
+			//ORIGIN : "http://homes.cs.washington.edu",
+		    ORIGIN : "http://127.0.0.1:8000",
+		    SERVER : "http://localhost:8075",
+			//SERVER : "http://treetm.jcchuang.org",
+		    ITER_INCREMENT : 5,
+		    ITER_COUNT : 1000,
+		    TOPIC_MODELS: [
+		      "nsf1k_treetm",
+		      "nsf10k_treetm",
+		      "nsf25k_treetm",
+			  //"nsfgrants_treetm",     // Temporarily taken out until we have a MALLET -> ITM pipeline set up.
+		      "20newsgroups_treetm"
+	    	]
+		};
+	})
+	.factory("TopicModelService", ["$http", "$rootScope", "GlobalService", function ($http, $rootScope, GlobalService) {
+		var origin = GlobalService.ORIGIN;
+		var server = GlobalService.SERVER;
+		var iterIncrement = GlobalService.ITER_INCREMENT;
+		var iterCount = GlobalService.ITER_COUNT;
 		var TopicModelService = {};
-		var iterCount = 1000;
 
 		TopicModelService.topicModelId = null;
 		TopicModelService.topicModel = null;
@@ -21,11 +31,11 @@ angular.module('termite.services', [])
 		TopicModelService.getTopicModel = function (id, terms) {
 			$rootScope.$broadcast("topic-model-loading");
 			var data = {
-				"origin": ORIGIN,
+				"origin": origin,
 				"format": "json",
 				"termLimit" : terms
 			}
-			var url = SERVER + "/" + id + "/itm/gib";
+			var url = server + "/" + id + "/itm/gib";
 			console.log("[LOADING]", "URL", url, "DATA", data);
 			$http({
 				url : url,
@@ -49,9 +59,9 @@ angular.module('termite.services', [])
 
 		TopicModelService.continueITM = function (data) {
 			$rootScope.$broadcast("topic-model-loading");
-			iterCount += ITER_INCREMENT;
+			iterCount += iterIncrement;
 			var data = {
-					"origin": ORIGIN,
+					"origin": origin,
 					"format": "json",
 					"action":"train",
 					"termLimit": 10,
@@ -61,7 +71,7 @@ angular.module('termite.services', [])
 					"keepTerms": JSON.stringify(data.keep),
 					"removeTerms": JSON.stringify(data.remove)
 				};
-			var url = SERVER + "/" + TopicModelService.topicModelId + "/itm/gib"
+			var url = server + "/" + TopicModelService.topicModelId + "/itm/gib"
 			console.log("[LOADING]", "URL", url, "DATA", data);
 			$http({
 				url : url,
@@ -80,5 +90,5 @@ angular.module('termite.services', [])
 
 		return TopicModelService;
 
-	});
+	}]);
 ;

@@ -13,7 +13,6 @@
 
   100% {
     color: #ecf0f1; } }
-
 @-webkit-keyframes load {
   0% {
     color: #ecf0f1; }
@@ -29,7 +28,6 @@
 
   100% {
     color: #ecf0f1; } }
-
 .ui-loader {
   animation: load 2s infinite ease-out;
   -webkit-animation: load 2s infinite ease-out;
@@ -117,9 +115,8 @@ body {
   float: left;
   border: solid 1px #34495e;
   margin: 5px; }
-
-.topic-hovered .topic-header {
-  background-color: #1abc9c; }
+  .topic.hovered .topic-header {
+    background-color: #1abc9c; }
 
 .topic-header {
   -webkit-transition: width 0.25s;

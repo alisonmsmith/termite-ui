@@ -1,16 +1,16 @@
 {
   "name": "angular-loader",
-  "version": "1.2.16",
+  "version": "1.2.23",
   "main": "./angular-loader.js",
   "dependencies": {
-    "angular": "1.2.16"
+    "angular": "1.2.23"
   },
   "homepage": "https://github.com/angular/bower-angular-loader",
-  "_release": "1.2.16",
+  "_release": "1.2.23",
   "_resolution": {
     "type": "version",
-    "tag": "v1.2.16",
-    "commit": "ac209f3019f54f5ce6d212af717d6c8ef088149c"
+    "tag": "v1.2.23",
+    "commit": "015ba33cac751dfcc11de560d8e0298ad3ac30dd"
   },
   "_source": "git://github.com/angular/bower-angular-loader.git",
   "_target": "1.2.x",

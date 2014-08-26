@@ -6,14 +6,8 @@ angular.module('termite.controllers', [])
   /**
   * Controller for Loading Data Sets
   */
-  .controller('DatasetController', ['$scope', 'TopicModelService', function($scope, TopicModelService) {
-	  $scope.topicModels = [
-	      "nsf1k_treetm",
-	      "nsf10k_treetm",
-	      "nsf25k_treetm",
-//	      "nsfgrants_treetm",     // Temporarily taken out until we have a MALLET -> ITM pipeline set up.
-	      "20newsgroups_treetm"
-	    ];
+  .controller('DatasetController', ['$scope', 'TopicModelService', 'GlobalService', function($scope, TopicModelService, GlobalService) {
+	  $scope.topicModels = GlobalService.TOPIC_MODELS;
 	  $scope.topicModel = $scope.topicModels[0];
 
 	  $scope.termLimits = [ 5, 7, 10, 15, 20 ];
