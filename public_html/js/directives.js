@@ -39,6 +39,21 @@ angular.module('termite.directives', [])
 
 	  		var color = d3.scale.category20();
 
+	  		// set the radius of the nodes on a linear scale
+	  		// based on the min & max values for all of the nodes
+	  		var node_radius = d3.scale.linear();
+
+	  		var node_radius_max = d3.max(topic.nodes, function (d) {
+	  			return d.value;
+	  		});
+
+	  		var node_radius_min = d3.min(topic.nodes, function (d) {
+	  			return d.value;
+	  		});
+
+	  		node_radius.domain([node_radius_min, node_radius_max]);
+	  		node_radius.range([5,50]);
+
 	  		var k = Math.sqrt(topic.nodes.length / (width * height));
 	  		var d = 2*topic.edges.length/(topic.nodes.length*(topic.nodes.length-1));
 
@@ -156,7 +171,8 @@ angular.module('termite.directives', [])
 
 	          	var circle = nodeEnter.append("circle")
 		        	.attr("class", "circle")
-		      	  	.attr("r", function (d) { return Math.min(d.value*2000, 40) + "px"; })
+		      	  	//.attr("r", function (d) { return Math.min(d.value*2000, 40) + "px"; })
+		      	  	.attr("r", function (d) { return node_radius(d.value) + "px"; })
 		        	.call(nodedrag);
 
 		    	var label = nodeEnter.append("text")
