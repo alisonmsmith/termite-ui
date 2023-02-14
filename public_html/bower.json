@@ -5,12 +5,12 @@
   "homepage": "https://github.com/alisonmsmith/termite-ui",
   "private": true,
   "dependencies": {
-    "angular": "1.2.x",
-    "angular-route": "1.2.x",
-    "angular-loader": "1.2.x",
-    "angular-mocks": "~1.2.15",
-    "underscore": "",
-    "d3": "",
-    "jquery":""
+    "angular": "1.2.23",
+    "angular-route": "1.2.23",
+    "angular-loader": "1.2.23",
+    "angular-mocks": "1.2.23",
+    "underscore": "1.6.0",
+    "d3": "3.4.11",
+    "jquery":"2.1.1"
   }
 }
